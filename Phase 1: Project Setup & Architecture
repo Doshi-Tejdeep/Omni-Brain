@@ -54,3 +54,114 @@ Day 5:
 
 Git Branches
 main, develop, feature/backend, feature/frontend, feature/document-processing, feature/rag, feature/database, feature/devops
+# Omni Brain
+
+## 📌 Overview
+Omni Brain is an AI-powered intelligent assistant designed to understand natural language, answer user queries, and perform various tasks using a Large Language Model (LLM). The project provides a user-friendly interface where users can interact with the AI in real time.
+
+---
+
+## 🚀 Features
+
+- 🤖 AI-powered conversational assistant
+- 💬 Natural language understanding
+- ⚡ Fast and intelligent responses
+- 🔍 Information retrieval
+- 📚 Context-aware conversations
+- 🔒 Secure and scalable architecture
+- 🌐 Easy-to-use web interface
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- Python
+- Flask
+
+### AI Model
+- Large Language Model (LLM)
+
+### Version Control
+- Git
+- GitHub
+
+---
+
+## 📂 Project Structure
+
+```
+OmniBrain/
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── backend/
+│   ├── app.py
+│   ├── routes.py
+│   └── requirements.txt
+│
+├── README.md
+└── LICENSE
+```
+
+
+## 🎯 Objectives
+
+- Build an intelligent AI assistant.
+- Provide accurate responses to user queries.
+- Enable natural language communication.
+- Create a scalable and user-friendly application.
+
+---
+
+## 📈 Future Enhancements
+
+- Voice interaction
+- Image understanding
+- Multi-language support
+- User authentication
+- Cloud deployment
+- Mobile application
+- Personalized AI responses
+
+---
+
+## 👥 Team
+
+- Team Leader: Tejdeep
+- Team Members:
+  - Saumaditya
+  -  pavan
+  - rishi
+  -Mariam
+  - Teja
+  - Sunishka
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## ⭐ Acknowledgements
+
+- OpenAI
+- Flask
+- GitHub
+- Python Community
+
+---
+
+## 📧 Contact
+
+For any queries or suggestions, please contact the project team.
