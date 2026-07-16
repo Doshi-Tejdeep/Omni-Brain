@@ -1,15 +1,33 @@
 from fastapi import FastAPI, UploadFile, File
-app= FastAPI()
-@app.get("/")
-def home():
-    return {"message": "Welcome to OmniBrain API"}
 
+# Create FastAPI application
+app = FastAPI(
+    title="OmniBrain Backend API",
+    description="Backend API for OmniBrain Multi-Modal RAG Project",
+    version="1.0.0"
+)
+
+# Root endpoint
+@app.get("/")
+def root():
+    return {
+        "message": "Welcome to OmniBrain Backend API"
+    }
+
+# Health endpoint
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "message": "Backend is running successfully"
+    }
+
+
+# Upload endpoint
 @app.post("/upload")
-async def upload(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
-        "type": file.content_type
-    }  
+        "content_type": file.content_type, 
+        "message": "File uploaded successfully"
+    }
