@@ -12,6 +12,9 @@ jobs:
     name: Run quality checks
     runs-on: ubuntu-latest
 
+  pytest:
+    name: Run pytest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -23,11 +26,17 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
 
+ci/add-pr-quality-checks
       - name: Install development tools
         run: python -m pip install -r requirements-dev.txt
 
       - name: Run pre-commit checks
         run: pre-commit run --all-files
 
+=======
+      - name: Install test tools
+        run: python -m pip install -r requirements-dev.txt
+
+ main
       - name: Run tests
         run: pytest
