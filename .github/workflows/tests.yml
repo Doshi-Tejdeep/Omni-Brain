@@ -1,4 +1,4 @@
-name: Quality Checks
+name: Tests
 
 on:
   push:
@@ -8,10 +8,6 @@ permissions:
   contents: read
 
 jobs:
-  quality:
-    name: Run quality checks
-    runs-on: ubuntu-latest
-
   pytest:
     name: Run pytest
     runs-on: ubuntu-latest
@@ -26,17 +22,8 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
 
-ci/add-pr-quality-checks
-      - name: Install development tools
-        run: python -m pip install -r requirements-dev.txt
-
-      - name: Run pre-commit checks
-        run: pre-commit run --all-files
-
-=======
       - name: Install test tools
         run: python -m pip install -r requirements-dev.txt
 
- main
       - name: Run tests
         run: pytest
