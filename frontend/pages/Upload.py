@@ -39,6 +39,14 @@ defaults = {
     "questions_asked": 0,
     "processed_document_id": None,
     "last_uploaded_file_id": None,
+    # Day 5 additions — loading state tracking
+    "is_uploading": False,
+    "upload_stage": None,          # "connecting" | "uploading" | "processing" | "done" | "error"
+    "upload_error": None,
+    "pending_file_bytes": None,
+    "pending_file_name": None,
+    "pending_file_type": None,
+    "pending_file_id": None,
 }
 
 for key, value in defaults.items():
@@ -237,6 +245,11 @@ h1, h2, h3 {
     background: linear-gradient(90deg, rgba(16,185,129,0.14), rgba(6,182,212,0.06));
 }
 
+.banner.busy {
+    border-left-color: var(--accent-1);
+    background: linear-gradient(90deg, rgba(124,58,237,0.16), rgba(236,72,153,0.08));
+}
+
 .dot {
     width: 10px;
     height: 10px;
@@ -248,6 +261,11 @@ h1, h2, h3 {
 
 .banner.success .dot {
     background: #10b981;
+}
+
+.banner.busy .dot {
+    background: var(--accent-1);
+    animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
@@ -312,6 +330,47 @@ h1, h2, h3 {
     background: var(--bg-card);
 }
 
+/* Day 5 addition — stage tracker chips */
+.stage-track {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 6px 0;
+}
+
+.stage-chip {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+    transition: all 0.3s ease;
+}
+
+.stage-chip.active {
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+}
+
+.stage-chip.done {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border-color: rgba(16,185,129,0.3);
+}
+
+.stage-chip.failed {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    border-color: rgba(239,68,68,0.3);
+}
+
 div.stButton > button {
     background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
     color: white;
@@ -322,13 +381,20 @@ div.stButton > button {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-div.stButton > button:hover {
+div.stButton > button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(124,58,237,0.4);
 }
 
 div.stButton > button:active {
     transform: translateY(0) scale(0.98);
+}
+
+div.stButton > button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .security-note {
@@ -391,6 +457,34 @@ for size, left, duration, delay in zip(sizes, lefts, durations, delays):
 particles_html += "</div>"
 
 st.markdown(particles_html, unsafe_allow_html=True)
+
+
+# -------------------------------------------------------------------
+# Day 5 helper — stage tracker + banner rendering
+# -------------------------------------------------------------------
+
+STAGE_ORDER = ["connecting", "uploading", "processing", "done"]
+STAGE_LABELS = {
+    "connecting": "Connecting",
+    "uploading": "Uploading",
+    "processing": "Processing",
+    "done": "Completed",
+}
+
+
+def render_stage_track(current_stage: str, failed: bool = False):
+    chips = []
+    for stage in STAGE_ORDER:
+        if failed and stage == current_stage:
+            css_class = "failed"
+        elif STAGE_ORDER.index(stage) < STAGE_ORDER.index(current_stage):
+            css_class = "done"
+        elif stage == current_stage:
+            css_class = "active"
+        else:
+            css_class = ""
+        chips.append(f'<div class="stage-chip {css_class}">{STAGE_LABELS[stage]}</div>')
+    st.markdown(f'<div class="stage-track">{"".join(chips)}</div>', unsafe_allow_html=True)
 
 
 # -------------------------------------------------------------------
@@ -499,6 +593,7 @@ file = st.file_uploader(
     type=["pdf"],
     label_visibility="collapsed",
     help=f"PDF files up to {MAX_FILE_MB} MB are supported.",
+    disabled=st.session_state.is_uploading,   # Day 5: lock the widget mid-upload
 )
 
 st.caption(f"PDF only - Maximum file size: {MAX_FILE_MB} MB")
@@ -534,7 +629,7 @@ else:
         unsafe_allow_html=True,
     )
 
-if file is None:
+if file is None and not st.session_state.is_uploading:
     st.markdown(
         f"""
         <div class="banner">
@@ -545,7 +640,7 @@ if file is None:
         unsafe_allow_html=True,
     )
 
-else:
+elif file is not None and not st.session_state.is_uploading:
     is_valid, validation_message = validate_pdf(file)
 
     if not is_valid:
@@ -580,88 +675,180 @@ else:
             unsafe_allow_html=True,
         )
 
+        # Day 5: clicking now just arms the upload and reruns immediately,
+        # so the button/uploader render disabled BEFORE the network call starts.
         if st.button(
             "Upload to OmniBrain",
-            disabled=not backend_online,
+            disabled=not backend_online or st.session_state.is_uploading,
         ):
-            progress = st.progress(10, text="Preparing secure upload...")
+            st.session_state.is_uploading = True
+            st.session_state.upload_stage = "connecting"
+            st.session_state.upload_error = None
+            st.session_state.pending_file_bytes = file_bytes
+            st.session_state.pending_file_name = file.name
+            st.session_state.pending_file_type = file.type or "application/pdf"
+            st.session_state.pending_file_id = file_id
+            st.rerun()
 
-            try:
-                progress.progress(35, text="Sending PDF to FastAPI...")
 
-                response = requests.post(
-                    UPLOAD_URL,
-                    files={
-                        "file": (
-                            file.name,
-                            file_bytes,
-                            file.type or "application/pdf",
-                        )
-                    },
-                    timeout=30,
-                )
+# -------------------------------------------------------------------
+# Day 5: active upload — runs on the rerun triggered above, with the
+# button/uploader already disabled, so duplicate uploads can't fire.
+# -------------------------------------------------------------------
 
-                progress.progress(80, text="Confirming backend response...")
+if st.session_state.is_uploading and st.session_state.pending_file_bytes is not None:
+    stage_box = st.empty()
+    status_box = st.empty()
+    progress = st.progress(10, text="Preparing secure upload...")
 
-                if response.status_code == 200:
-                    result = response.json()
+    file_bytes = st.session_state.pending_file_bytes
+    file_name = st.session_state.pending_file_name
+    file_type = st.session_state.pending_file_type
+    file_id = st.session_state.pending_file_id
 
-                    st.session_state.uploaded_file = result.get(
-                        "filename",
-                        file.name,
-                    )
-                    st.session_state.processed_document_id = file_id
-                    st.session_state.workspace_status = "Ready"
+    try:
+        # ---- Connecting ----
+        st.session_state.upload_stage = "connecting"
+        with stage_box.container():
+            render_stage_track("connecting")
+        with status_box.container():
+            st.markdown(
+                f"""
+                <div class="banner busy">
+                    <div class="dot"></div>
+                    <div>Connecting to OmniBrain backend at {API_BASE_URL}...</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        progress.progress(25, text="Connecting...")
 
-                    if st.session_state.last_uploaded_file_id != file_id:
-                        st.session_state.prepared_docs += 1
-                        st.session_state.last_uploaded_file_id = file_id
+        # ---- Uploading ----
+        st.session_state.upload_stage = "uploading"
+        with stage_box.container():
+            render_stage_track("uploading")
+        with status_box.container():
+            st.markdown(
+                f"""
+                <div class="banner busy">
+                    <div class="dot"></div>
+                    <div>Sending '{escape(file_name)}' to FastAPI...</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        progress.progress(50, text="Sending PDF to FastAPI...")
 
-                    progress.progress(100, text="Upload complete.")
+        response = requests.post(
+            UPLOAD_URL,
+            files={"file": (file_name, file_bytes, file_type)},
+            timeout=30,
+        )
 
-                    st.markdown(
-                        f"""
-                        <div class="banner success">
-                            <div class="dot"></div>
-                            <div>
-                                <strong>Upload successful.</strong>
-                                {result.get("message", "Document accepted by OmniBrain backend.")}
-                            </div>
+        # ---- Processing ----
+        st.session_state.upload_stage = "processing"
+        with stage_box.container():
+            render_stage_track("processing")
+        with status_box.container():
+            st.markdown(
+                """
+                <div class="banner busy">
+                    <div class="dot"></div>
+                    <div>Confirming backend response...</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        progress.progress(80, text="Confirming backend response...")
+
+        if response.status_code == 200:
+            result = response.json()
+
+            st.session_state.uploaded_file = result.get("filename", file_name)
+            st.session_state.processed_document_id = file_id
+            st.session_state.workspace_status = "Ready"
+
+            if st.session_state.last_uploaded_file_id != file_id:
+                st.session_state.prepared_docs += 1
+                st.session_state.last_uploaded_file_id = file_id
+
+            # ---- Completed ----
+            st.session_state.upload_stage = "done"
+            with stage_box.container():
+                render_stage_track("done")
+            progress.progress(100, text="Upload complete.")
+
+            with status_box.container():
+                st.markdown(
+                    f"""
+                    <div class="banner success">
+                        <div class="dot"></div>
+                        <div>
+                            <strong>Upload successful.</strong>
+                            {escape(result.get("message", "Document accepted by OmniBrain backend."))}
                         </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-
-                    if st.button("Go to Ask OmniBrain"):
-                        st.switch_page("pages/Chat.py")
-
-                else:
-                    try:
-                        error_detail = response.json().get(
-                            "detail",
-                            response.text,
-                        )
-                    except ValueError:
-                        error_detail = response.text
-
-                    st.error(
-                        f"Upload failed ({response.status_code}): {error_detail}"
-                    )
-
-            except requests.ConnectionError:
-                st.error(
-                    "Cannot connect to FastAPI. Confirm the backend is running "
-                    "at http://127.0.0.1:8000."
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
+            st.balloons()
 
-            except requests.Timeout:
-                st.error("The upload request timed out. Please try again.")
+        else:
+            try:
+                error_detail = response.json().get("detail", response.text)
+            except ValueError:
+                error_detail = response.text
 
-            except requests.RequestException as error:
-                st.error(f"Upload error: {error}")
+            st.session_state.upload_error = f"Upload failed ({response.status_code}): {error_detail}"
+            with stage_box.container():
+                render_stage_track(st.session_state.upload_stage, failed=True)
+            with status_box.container():
+                st.error(st.session_state.upload_error)
 
-            finally:
-                progress.empty()
+    except requests.ConnectionError:
+        st.session_state.upload_error = (
+            "Cannot connect to FastAPI. Confirm the backend is running "
+            "at http://127.0.0.1:8000."
+        )
+        with stage_box.container():
+            render_stage_track(st.session_state.upload_stage or "connecting", failed=True)
+        with status_box.container():
+            st.error(st.session_state.upload_error)
+
+    except requests.Timeout:
+        st.session_state.upload_error = "The upload request timed out. Please try again."
+        with stage_box.container():
+            render_stage_track(st.session_state.upload_stage or "uploading", failed=True)
+        with status_box.container():
+            st.error(st.session_state.upload_error)
+
+    except requests.RequestException as error:
+        st.session_state.upload_error = f"Upload error: {error}"
+        with stage_box.container():
+            render_stage_track(st.session_state.upload_stage or "uploading", failed=True)
+        with status_box.container():
+            st.error(st.session_state.upload_error)
+
+    finally:
+        progress.empty()
+        st.session_state.is_uploading = False
+        st.session_state.pending_file_bytes = None
+        st.session_state.pending_file_name = None
+        st.session_state.pending_file_type = None
+        st.session_state.pending_file_id = None
+
+
+# -------------------------------------------------------------------
+# Post-upload navigation (shown once, after a completed upload)
+# -------------------------------------------------------------------
+
+if (
+    st.session_state.uploaded_file
+    and not st.session_state.is_uploading
+    and st.session_state.upload_stage == "done"
+):
+    if st.button("Go to Ask OmniBrain"):
+        st.switch_page("pages/Chat.py")
 
 
 # -------------------------------------------------------------------
