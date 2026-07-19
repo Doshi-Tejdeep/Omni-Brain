@@ -36,8 +36,8 @@ DevOps
 - Pre-commit
 
 #Folder Structure of the Omni Brain Project
-- Omni-Brain/ 
--│
+- Omni-Brain/
+- 
 -├── backend/
 
 -├── frontend/
