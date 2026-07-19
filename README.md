@@ -76,16 +76,22 @@ docker compose up --build
 # Development Workflow
 Requirement Analysis
         ↓
+        
 System Design
         ↓
+        
 Development
         ↓
+        
 Integration
         ↓
+        
 Testing
         ↓
+        
 Deployment
         ↓
+        
 Monitoring & Maintenance
 # Testing
 pytest
