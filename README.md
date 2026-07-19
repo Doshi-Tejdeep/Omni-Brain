@@ -34,6 +34,7 @@ DevOps
 - Docker Compose
 - GitHub Actions
 - Pre-commit
+
 #Folder Structure of the Omni Brain Project
 - Omni-Brain/ 
 │
