@@ -39,14 +39,23 @@ DevOps
 - Omni-Brain/ 
 -│
 -├── backend/
+
 -├── frontend/
+
 -├── docs/
+
 -├── tests/
+
 -├── sample_data/
+
 -├── Dockerfile
+
 -├── docker-compose.yml
+
 -├── README.md
+
 -└── requirements.txt
+
 # Progress of Installation
 git clone <repository-url>
 
@@ -75,21 +84,27 @@ docker compose up --build
 | Sunishka   | DevOps/QA           |
 # Development Workflow
 Requirement Analysis
+
         ↓
         
 System Design
+
         ↓
         
 Development
+
         ↓
         
 Integration
+
         ↓
         
 Testing
+
         ↓
         
 Deployment
+
         ↓
         
 Monitoring & Maintenance
