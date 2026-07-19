@@ -16,11 +16,14 @@ def extract_text_from_pdf(pdf_path: str) -> list[dict]:
     extracted_pages = []
 
     with fitz.open(path) as document:
-        for page_number, page in enumerate(document, start=1):
+    for page_number, page in enumerate(document, start=1):
+        text = page.get_text("text").strip()
+
+        if text:
             extracted_pages.append(
                 {
                     "page_number": page_number,
-                    "text": page.get_text("text"),
+                    "text": text,
                 }
             )
 
