@@ -37,16 +37,16 @@ DevOps
 
 #Folder Structure of the Omni Brain Project
 - Omni-Brain/ 
-│
-├── backend/
-├── frontend/
-├── docs/
-├── tests/
-├── sample_data/
-├── Dockerfile
-├── docker-compose.yml
-├── README.md
-└── requirements.txt
+-│
+-├── backend/
+-├── frontend/
+-├── docs/
+-├── tests/
+-├── sample_data/
+-├── Dockerfile
+-├── docker-compose.yml
+-├── README.md
+-└── requirements.txt
 # Progress of Installation
 git clone <repository-url>
 
