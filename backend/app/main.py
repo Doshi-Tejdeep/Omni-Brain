@@ -1,5 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from app.utils.logger import logger
+import os
+import shutil
+
 # Create FastAPI application
 app = FastAPI(
     title="OmniBrain Backend API",
@@ -9,6 +12,10 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     logger.info("Backend server started")
+
+UPLOAD_DIR = "storage/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 # Root endpoint
 @app.get("/")
@@ -38,9 +45,8 @@ async def upload_file(file: UploadFile = File(...)):
         )
 
     content = await file.read()
-    logger.info(
-    f"{file.filename} uploaded successfully"
-)
+    
+
 
     MAX_SIZE = 10 * 1024 * 1024
 
@@ -51,6 +57,13 @@ async def upload_file(file: UploadFile = File(...)):
         )
 
     await file.seek(0)
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
+
+    with open(file_path, "wb") as buffer:
+     shutil.copyfileobj(file.file, buffer)
+     logger.info(f"{file.filename} stored at {file_path}")
+     logger.info(f"{file.filename} uploaded successfully")
+
 
     if len(content) == 0:
         raise HTTPException(
@@ -66,9 +79,10 @@ async def upload_file(file: UploadFile = File(...)):
             status_code=500,
             detail=str(e)
         )
-
+  
     return {
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "message": "File uploaded successfully"
-    }   
+    "message": "File uploaded successfully",
+    "filename": file.filename,
+    "content_type": file.content_type,
+    "path": file_path
+}
