@@ -31,3 +31,10 @@ def route_query(state: AgentState) -> AgentState:
         state["route"] = "search"
 
     return state
+
+def decide_next_node(state: AgentState) -> str:
+    """
+    Decide which LangGraph node should execute next.
+    """
+
+    return state["route"]

@@ -2,7 +2,7 @@ from graph import graph
 
 # Initial state
 initial_state = {
-    "query": "Explain the uploaded document",
+    "query": "Analyze this chart",
     "route": "",
     "context": "",
     "response": ""
