@@ -1,10 +1,20 @@
 from router import route_query
 
-state = {
-    "query": "Show me the sales chart",
-    "route": "",
-    "context": "",
-    "response": "",
-}
+test_queries = [
+    "Show employee database",
+    "Display sales chart",
+    "Explain the uploaded document"
+]
 
-print(route_query(state))
+for query in test_queries:
+    state = {
+        "query": query,
+        "route": "",
+        "context": "",
+        "response": ""
+    }
+
+    result = route_query(state)
+    print(f"Query: {query}")
+    print(f"Selected Route: {result['route']}")
+    print("-" * 40)

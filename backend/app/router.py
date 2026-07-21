@@ -1,5 +1,12 @@
 from state import AgentState
 
+# Supported AI Agents
+AGENT_DESCRIPTIONS = {
+    "search": "Handles document retrieval and RAG-based question answering.",
+    "sql": "Handles database queries and structured data retrieval.",
+    "vision": "Handles image and chart understanding."
+}
+
 # Keywords used for routing
 SQL_KEYWORDS = {"sql", "table", "database", "query"}
 VISION_KEYWORDS = {"image", "chart", "graph", "plot", "photo"}
@@ -24,3 +31,10 @@ def route_query(state: AgentState) -> AgentState:
         state["route"] = "search"
 
     return state
+
+def decide_next_node(state: AgentState) -> str:
+    """
+    Decide which LangGraph node should execute next.
+    """
+
+    return state["route"]
