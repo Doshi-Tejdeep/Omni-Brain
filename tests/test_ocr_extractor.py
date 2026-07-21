@@ -2,9 +2,9 @@ from backend.document_processing.ocr_extractor import (
     extract_text_with_ocr,
 )
 
-pages = extract_text_with_ocr("sample_data/sample.pdf")
+def test_extract_text_with_ocr():
+    pages = extract_text_with_ocr("sample_data/sample.pdf")
 
-for page in pages:
-    print(f"Page {page['page_number']}")
-    print(page["text"])
-    print("-" * 40)
+    assert pages is not None
+    assert isinstance(pages, list)
+    
