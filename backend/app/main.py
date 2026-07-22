@@ -1,7 +1,10 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from pydantic import BaseModel
 from app.utils.logger import logger
 import os
 import shutil
+class QuestionRequest(BaseModel):
+    question: str
 
 # Create FastAPI application
 app = FastAPI(
@@ -82,7 +85,39 @@ async def upload_file(file: UploadFile = File(...)):
         )
   
     return {
-        "filename": file.filename,
-        "content_type": file.content_type, 
-        "message": "File uploaded successfully"
-    }
+    "message": "File uploaded successfully",
+    "filename": file.filename,
+    "content_type": file.content_type,
+    "path": file_path
+}
+
+@app.post("/ask")
+async def ask_question(request: QuestionRequest):
+    try:
+        
+        if not request.question.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Question cannot be empty."
+            )
+
+        
+        logger.info(f"Question received: {request.question}")
+
+        
+        return {
+            "question": request.question,
+            "answer": "Answer generation is under development."
+        }
+
+    
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        logger.error(f"Ask API failed: {str(e)}")
+
+        raise HTTPException(
+            status_code=500,
+            detail="Internal Server Error"
+        )
