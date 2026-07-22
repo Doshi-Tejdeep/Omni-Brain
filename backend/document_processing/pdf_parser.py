@@ -12,7 +12,8 @@ def extract_text_from_pdf(pdf_path: str) -> list[dict]:
 
     if not path.exists():
         raise FileNotFoundError(f"PDF file not found: {pdf_path}")
-
+    if path.suffix.lower() != ".pdf":
+        raise ValueError("Only PDF files are supported.")
     extracted_pages = []
 
     with fitz.open(path) as document:
