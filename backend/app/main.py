@@ -35,6 +35,7 @@ def health():
         "message": "Backend is running successfully"
     }
 
+# Upload endpoint
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     logger.info(f"Upload request received: {file.filename}")
