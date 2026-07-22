@@ -1,0 +1,167 @@
+Objective
+Build the project foundation and allow every team member to make one meaningful commit each day while keeping the project continuously integratable.
+
+Team Structure
+Tejdeep(Lead): Create GitHub repo, architecture diagram, branching strategy, README, coding standards, review PRs, integrate changes.
+Member 1: Backend: FastAPI skeleton, health endpoint, upload endpoint scaffold.
+Member 2: Frontend: Streamlit UI skeleton, upload page, chat layout.
+Member 3: Document Processing: PDF parser scaffold, folder structure, sample extraction.
+Member 4: AI/RAG: LangChain setup, prompt templates, agent workflow diagrams.
+Member 5: Database: SQLite/PostgreSQL schema, metadata tables, ORM models.
+Member 6: DevOps/QA: Dockerfile, docker-compose, pre-commit, pytest setup, GitHub Actions skeleton.
+
+Daily Commit Plan (5 Days)
+Day 1: 
+  Lead: repo+README.
+  M1 FastAPI app. 
+  M2 Streamlit app. 
+  M3 parser folders. 
+  M4 LangChain env. 
+  M5 DB schema. 
+  M6 Dockerfile.
+Day 2: 
+  Lead:architecture doc.
+  M1 upload API. 
+  M2 upload UI. 
+  M3 text extraction. 
+  M4 prompt templates. 
+  M5 ORM models. 
+  M6 docker-compose.
+Day 3: 
+  Lead: review/integration. 
+  M1 API validation. 
+  M2 response page. 
+  M3 chunking. 
+  M4 workflow diagrams. 
+  M5 metadata CRUD. 
+  M6 pytest.
+Day 4: 
+  Lead: coding standards. 
+  M1 logging. 
+  M2 sidebar/history. 
+  M3 table extraction. 
+  M4 agent interfaces. 
+  M5 migrations. 
+  M6 GitHub Actions.
+Day 5: 
+  Lead: merge/release. 
+  M1 API docs. 
+  M2 UI polish. 
+  M3 image extraction. 
+  M4 config. 
+  M5 seed data. 
+  M6 integration tests.
+
+Git Branches
+main, develop, feature/backend, feature/frontend, feature/document-processing, feature/rag, feature/database, feature/devops
+# Omni Brain
+
+## 📌 Overview
+Omni Brain is an AI-powered intelligent assistant designed to understand natural language, answer user queries, and perform various tasks using a Large Language Model (LLM). The project provides a user-friendly interface where users can interact with the AI in real time.
+
+---
+
+## 🚀 Features
+
+- 🤖 AI-powered conversational assistant
+- 💬 Natural language understanding
+- ⚡ Fast and intelligent responses
+- 🔍 Information retrieval
+- 📚 Context-aware conversations
+- 🔒 Secure and scalable architecture
+- 🌐 Easy-to-use web interface
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- Python
+- Flask
+
+### AI Model
+- Large Language Model (LLM)
+
+### Version Control
+- Git
+- GitHub
+
+---
+
+## 📂 Project Structure
+
+```
+OmniBrain/
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── backend/
+│   ├── app.py
+│   ├── routes.py
+│   └── requirements.txt
+│
+├── README.md
+└── LICENSE
+```
+
+
+## 🎯 Objectives
+
+- Build an intelligent AI assistant.
+- Provide accurate responses to user queries.
+- Enable natural language communication.
+- Create a scalable and user-friendly application.
+
+---
+
+## 📈 Future Enhancements
+
+- Voice interaction
+- Image understanding
+- Multi-language support
+- User authentication
+- Cloud deployment
+- Mobile application
+- Personalized AI responses
+
+---
+
+## 👥 Team
+
+- Team Leader: Tejdeep
+- Team Members:
+  - Saumaditya
+  -  pavan
+  - rishi
+  -Mariam
+  - Teja
+  - Sunishka
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## ⭐ Acknowledgements
+
+- OpenAI
+- Flask
+- GitHub
+- Python Community
+
+---
+
+## 📧 Contact
+
+For any queries or suggestions, please contact the project team.

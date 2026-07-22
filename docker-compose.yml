@@ -1,0 +1,4 @@
+services:
+  qa:
+    build: .
+    command: pytest
