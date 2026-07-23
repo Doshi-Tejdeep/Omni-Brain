@@ -565,3 +565,4 @@ elif st.session_state.page == "Chat":
                     time.sleep(1)
                 st.write("🔌 Connect this to your AI backend to generate real answers here.")
 
+

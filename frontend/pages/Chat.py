@@ -314,6 +314,21 @@ if not st.session_state.uploaded_file:
 # ──────────────────────────────────────────────────────────────────────────
 # SUGGESTION CHIPS (only before first message)
 # ──────────────────────────────────────────────────────────────────────────
+
+
+st.divider()
+
+uploaded_document = st.session_state.get("staged_document")
+
+if uploaded_document:
+    document_name = uploaded_document.name
+    st.success(f"Document ready: {document_name}", icon="✓")
+else:
+    st.info(
+        "No document has been prepared yet. You can still use the chat interface, "
+        "but upload a document for document-based answers.",
+        icon="ℹ️",
+    )
 clicked = None
 if not st.session_state.messages:
     st.markdown("##### Try asking:")

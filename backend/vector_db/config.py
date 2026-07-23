@@ -1,1 +1,3 @@
-VECTOR_DB_HOST= "localhost"
+"""
+Configuration settings for the Vector Database.
+"""

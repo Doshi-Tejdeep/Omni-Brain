@@ -1,8 +1,9 @@
 # Vector Database
 
-This module manages vector storage and similarity search for Omni-Brain.
+This module contains the database configuration, ORM models, schemas, and related files for the Vector Database.
 
-## Purpose
-- Store embeddings
-- Retrieve similar vectors
-- Support semantic search
+## Database Migration
+
+Current implementation uses SQLAlchemy's `create_all()` to generate tables.
+
+Migration support (Alembic or another migration tool) will be integrated in future iterations to enable version-controlled schema changes.

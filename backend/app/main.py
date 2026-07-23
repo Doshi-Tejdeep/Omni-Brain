@@ -37,58 +37,66 @@ def health():
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
-    logger.info(f"Upload request received: {file.filename}")
-    if file.content_type != "application/pdf":
-        logger.warning(
-    f"Invalid file uploaded: {file.filename}"
+    try:
+        logger.info(f"Upload request received: {file.filename}")
+        if file.content_type != "application/pdf":
+          logger.warning(
+         f"Invalid file uploaded: {file.filename}"
 )
-        raise HTTPException(
+          raise HTTPException(
             status_code=400,
             detail="Only PDF files are allowed."
         )
 
-    content = await file.read()
+        content = await file.read()
+        if len(content) == 0:
+          logger.warning(f"Empty file uploaded: {file.filename}")
+
+          raise HTTPException(
+             status_code=400,
+             detail="Uploaded file is empty."
+    )
     
 
 
-    MAX_SIZE = 10 * 1024 * 1024
+        MAX_SIZE = 10 * 1024 * 1024
 
-    if len(content) > MAX_SIZE:
+        if len(content) > MAX_SIZE:
+         logger.warning(f"File too large: {file.filename}")
+
         raise HTTPException(
             status_code=400,
             detail="File size exceeds 10MB."
         )
 
-    await file.seek(0)
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+        await file.seek(0)
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-    with open(file_path, "wb") as buffer:
-     shutil.copyfileobj(file.file, buffer)
-     logger.info(f"{file.filename} stored at {file_path}")
-     logger.info(f"{file.filename} uploaded successfully")
+        with open(file_path, "wb") as buffer:
+         shutil.copyfileobj(file.file, buffer)
+        logger.info(f"{file.filename} stored at {file_path}")
+        logger.info(f"{file.filename} uploaded successfully")
 
 
-    if len(content) == 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Uploaded file is empty."
-        )
-
-    try:
-        pass
-    except Exception as e:
-        logger.error(str(e))
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+ 
   
-    return {
-    "message": "File uploaded successfully",
-    "filename": file.filename,
-    "content_type": file.content_type,
-    "path": file_path
+        return {
+       
+        "message": "File uploaded successfully",
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "path": file_path
 }
+    except HTTPException:
+     raise
+
+    except Exception as e:
+     logger.error(f"Upload failed: {str(e)}")
+
+    raise HTTPException(
+        status_code=500,
+        detail="Internal Server Error"
+    )
 
 @app.post("/ask")
 async def ask_question(request: QuestionRequest):
