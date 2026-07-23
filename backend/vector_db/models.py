@@ -24,3 +24,14 @@ class Document:
         self.upload_time = upload_time
         self.status = status
         self.page_count = page_count
+
+from datetime import datetime
+
+
+class History(Base):
+    __tablename__ = "history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
