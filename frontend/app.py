@@ -7,6 +7,12 @@ Run with:  streamlit run app.py
 
 import streamlit as st
 import time
+import requests
+
+# ──────────────────────────────────────────────────────────────────────────
+# BACKEND CONFIG
+# ──────────────────────────────────────────────────────────────────────────
+BACKEND_URL = "http://127.0.0.1:8000"
 
 # ──────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -120,6 +126,17 @@ section[data-testid="stSidebar"] * { color: var(--text-main); }
     letter-spacing: 1px;
     text-transform: uppercase;
     margin: 16px 0 8px 0;
+}
+
+/* ---- chat: answer card ---- */
+.answer-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid var(--accent-3);
+    border-radius: 12px;
+    padding: 16px 18px;
+    line-height: 1.55;
+    animation: fadeInUp 0.4s ease-out;
 }
 
 /* ---- sidebar: document chips ---- */
@@ -631,12 +648,60 @@ elif st.session_state.page == "Chat":
             st.rerun()
     else:
         st.caption(f"Chatting with: **{st.session_state.uploaded_file}**")
+
+        # replay previous turns
+        for turn in st.session_state.chat_history:
+            with st.chat_message("user"):
+                st.write(turn["question"])
+            with st.chat_message("assistant"):
+                st.markdown(
+                    f'<div class="answer-card">{turn["answer"]}</div>',
+                    unsafe_allow_html=True,
+                )
+                if turn.get("sources"):
+                    with st.expander(f"📚 Sources ({len(turn['sources'])})"):
+                        for src in turn["sources"]:
+                            st.markdown(f"- {src}")
+
         query = st.chat_input("Ask a question about your document...")
         if query:
-            st.session_state.questions_asked += 1
             with st.chat_message("user"):
                 st.write(query)
+
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    time.sleep(1)
-                st.write("🔌 Connect this to your AI backend to generate real answers here.")
+                    try:
+                        resp = requests.post(
+                            f"{BACKEND_URL}/ask",
+                            json={"question": query},
+                            timeout=30,
+                        )
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            answer = data.get("answer", "No answer returned.")
+                            # not in the API yet — read safely so the UI just
+                            # works once Backend/AI-RAG add it, no code change needed
+                            sources = data.get("sources", [])
+                        else:
+                            answer = f"⚠️ Backend returned an error ({resp.status_code}). Please try again."
+                            sources = []
+                    except requests.exceptions.ConnectionError:
+                        answer = "⚠️ Can't reach the backend. Make sure the FastAPI server is running on :8000."
+                        sources = []
+                    except requests.exceptions.Timeout:
+                        answer = "⚠️ The request timed out. Please try again."
+                        sources = []
+
+                st.markdown(
+                    f'<div class="answer-card">{answer}</div>',
+                    unsafe_allow_html=True,
+                )
+                if sources:
+                    with st.expander(f"📚 Sources ({len(sources)})"):
+                        for src in sources:
+                            st.markdown(f"- {src}")
+
+            st.session_state.questions_asked += 1
+            st.session_state.chat_history.append(
+                {"question": query, "answer": answer, "sources": sources}
+            )
