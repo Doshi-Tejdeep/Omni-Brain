@@ -47,3 +47,32 @@ def delete_document(db: Session, document_id: int):
     db.commit()
 
     return document
+
+from .models import History
+
+# CREATE HISTORY
+def create_history(db: Session, history: History):
+    db.add(history)
+    db.commit()
+    db.refresh(history)
+    return history
+
+
+# READ ALL HISTORY
+def get_history(db: Session):
+    return db.query(History).all()
+
+
+# DELETE HISTORY
+def delete_history(db: Session, history_id: int):
+    history = db.query(History).filter(
+        History.id == history_id
+    ).first()
+
+    if not history:
+        return None
+
+    db.delete(history)
+    db.commit()
+
+    return history
