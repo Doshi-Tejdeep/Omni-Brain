@@ -20,3 +20,17 @@ Fields:
 - created_at
 
 This will later be connected to the Ask API and chat interface.
+
+## Vector Store
+
+This module will integrate the project's vector database.
+
+Current status:
+- Placeholder implementation completed.
+- Database technology is yet to be finalized.
+
+Future support:
+- ChromaDB
+- FAISS
+- Pinecone
+- Qdrant
