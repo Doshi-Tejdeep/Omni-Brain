@@ -7,6 +7,12 @@ Run with:  streamlit run app.py
 
 import streamlit as st
 import time
+import requests
+
+# ──────────────────────────────────────────────────────────────────────────
+# BACKEND CONFIG
+# ──────────────────────────────────────────────────────────────────────────
+BACKEND_URL = "http://127.0.0.1:8000"
 
 # ──────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -26,7 +32,9 @@ defaults = {
     "questions_asked": 0,
     "workspace_status": "Waiting for upload",
     "uploaded_file": None,
+    "uploaded_files": [],     # list of {"name": ..., "status": "Ready"} for the sidebar doc list
     "page": "Home",
+    "chat_history": [],
 }
 for key, val in defaults.items():
     st.session_state.setdefault(key, val)
@@ -109,6 +117,57 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid var(--border-soft);
 }
 section[data-testid="stSidebar"] * { color: var(--text-main); }
+
+/* ---- sidebar: section labels ---- */
+.sb-section-label {
+    color: #a78bfa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 16px 0 8px 0;
+}
+
+/* ---- chat: answer card ---- */
+.answer-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid var(--accent-3);
+    border-radius: 12px;
+    padding: 16px 18px;
+    line-height: 1.55;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* ---- sidebar: document chips ---- */
+.sb-doc-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(6, 182, 212, 0.06);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+.sb-doc-chip.active {
+    border-color: var(--accent-3);
+    background: rgba(6, 182, 212, 0.15);
+}
+.sb-doc-chip .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 190px;
+}
+.sb-empty-state {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 6px 0 2px 0;
+}
 
 /* ---- headings ---- */
 h1, h2, h3 {
@@ -308,6 +367,13 @@ div.stButton > button:hover {
 }
 div.stButton > button:active { transform: translateY(0) scale(0.98); }
 
+/* ---- sidebar buttons: slightly smaller/tighter than main-area buttons ---- */
+section[data-testid="stSidebar"] div.stButton > button {
+    width: 100%;
+    padding: 0.45em 1em;
+    font-size: 13px;
+}
+
 /* ---- radio nav styled as pill tabs ---- */
 div[role="radiogroup"] label {
     border-radius: 10px;
@@ -358,25 +424,47 @@ particles_html += "</div>"
 st.markdown(particles_html, unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────────────────────────────────
-# SIDEBAR
+# SIDEBAR  (Day 6 — Frontend: Sidebar)
 # ──────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### 🧠 OmniBrain")
     st.caption("AI Document Intelligence")
     st.markdown("---")
 
+    # ---- Navigation ----
     nav_options = ["Home", "Chat", "Upload"]
     current_idx = nav_options.index(st.session_state.page) if st.session_state.page in nav_options else 0
     st.session_state.page = st.radio(
         "Navigate", nav_options, index=current_idx, label_visibility="collapsed"
     )
 
-    st.markdown("---")
-
-    if st.session_state.uploaded_file is None:
-        st.info("Upload a document to begin", icon="ℹ️")
+    # ---- Documents ----
+    st.markdown('<div class="sb-section-label">Documents</div>', unsafe_allow_html=True)
+    if not st.session_state.uploaded_files:
+        st.markdown(
+            '<div class="sb-empty-state">No documents uploaded yet</div>',
+            unsafe_allow_html=True,
+        )
     else:
-        st.success(f"Loaded: {st.session_state.uploaded_file}", icon="✅")
+        for doc in st.session_state.uploaded_files:
+            is_active = doc["name"] == st.session_state.uploaded_file
+            css_class = "sb-doc-chip active" if is_active else "sb-doc-chip"
+            st.markdown(
+                f"""
+                <div class="{css_class}">
+                    <span class="name">📄 {doc['name']}</span>
+                    <span class="pill ready">{doc['status']}</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # ---- Session controls ----
+    st.markdown('<div class="sb-section-label">Session</div>', unsafe_allow_html=True)
+    if st.button("🗑️  New Chat", use_container_width=True):
+        st.session_state.chat_history = []
+        st.session_state.questions_asked = 0
+        st.rerun()
 
     st.markdown("---")
     st.markdown("**SYSTEM STATUS**")
@@ -535,6 +623,11 @@ elif st.session_state.page == "Upload":
         st.session_state.uploaded_file = file.name
         st.session_state.prepared_docs += 1
         st.session_state.workspace_status = "Ready"
+
+        # keep the sidebar document list in sync, no duplicates on rerun
+        if not any(d["name"] == file.name for d in st.session_state.uploaded_files):
+            st.session_state.uploaded_files.append({"name": file.name, "status": "Ready"})
+
         st.success(f"✅ '{file.name}' is prepared and ready for chat.")
         st.balloons()
 
@@ -555,14 +648,60 @@ elif st.session_state.page == "Chat":
             st.rerun()
     else:
         st.caption(f"Chatting with: **{st.session_state.uploaded_file}**")
+
+        # replay previous turns
+        for turn in st.session_state.chat_history:
+            with st.chat_message("user"):
+                st.write(turn["question"])
+            with st.chat_message("assistant"):
+                st.markdown(
+                    f'<div class="answer-card">{turn["answer"]}</div>',
+                    unsafe_allow_html=True,
+                )
+                if turn.get("sources"):
+                    with st.expander(f"📚 Sources ({len(turn['sources'])})"):
+                        for src in turn["sources"]:
+                            st.markdown(f"- {src}")
+
         query = st.chat_input("Ask a question about your document...")
         if query:
-            st.session_state.questions_asked += 1
             with st.chat_message("user"):
                 st.write(query)
+
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    time.sleep(1)
-                st.write("🔌 Connect this to your AI backend to generate real answers here.")
+                    try:
+                        resp = requests.post(
+                            f"{BACKEND_URL}/ask",
+                            json={"question": query},
+                            timeout=30,
+                        )
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            answer = data.get("answer", "No answer returned.")
+                            # not in the API yet — read safely so the UI just
+                            # works once Backend/AI-RAG add it, no code change needed
+                            sources = data.get("sources", [])
+                        else:
+                            answer = f"⚠️ Backend returned an error ({resp.status_code}). Please try again."
+                            sources = []
+                    except requests.exceptions.ConnectionError:
+                        answer = "⚠️ Can't reach the backend. Make sure the FastAPI server is running on :8000."
+                        sources = []
+                    except requests.exceptions.Timeout:
+                        answer = "⚠️ The request timed out. Please try again."
+                        sources = []
 
+                st.markdown(
+                    f'<div class="answer-card">{answer}</div>',
+                    unsafe_allow_html=True,
+                )
+                if sources:
+                    with st.expander(f"📚 Sources ({len(sources)})"):
+                        for src in sources:
+                            st.markdown(f"- {src}")
 
+            st.session_state.questions_asked += 1
+            st.session_state.chat_history.append(
+                {"question": query, "answer": answer, "sources": sources}
+            )
