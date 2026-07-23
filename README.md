@@ -1,6 +1,6 @@
  #Title Of the Project
 "OmniBrain": Agentic Multi-Modal RAG Orchestrator
-# Omni-Brain Description 
+# Omni-Brain Description
 OmniBrain is an AI-powered assistant that integrates multiple AI models to provide intelligent conversations, task automation, code generation, document analysis, and productivity tools through a user-friendly interface.
 Omni Brain is an AI-powered knowledge management and question-answering platform that enables users to upload documents and interact with them using natural language. Instead of manually searching through files, users can ask questions in plain English, and the system retrieves the most relevant information from the uploaded documents using Retrieval-Augmented Generation (RAG) and Large Language Models (LLMs).
 
@@ -15,7 +15,7 @@ The project combines document processing, semantic search, vector databases, and
 - Streamlit frontend
 - Database storage
 - Docker support
-- # Tech stacks used to create a Omni Brain 
+- # Tech stacks used to create a Omni Brain
 - Frontend
 - Streamlit
 
@@ -37,7 +37,7 @@ DevOps
 
 #Folder Structure of the Omni Brain Project
 - Omni-Brain/
-- 
+-
 -├── backend/
 
 -├── frontend/
@@ -86,27 +86,58 @@ docker compose up --build
 Requirement Analysis
 
         ↓
-        
+
 System Design
 
         ↓
-        
+
 Development
 
         ↓
-        
+
 Integration
 
         ↓
-        
+
 Testing
 
         ↓
-        
+
 Deployment
 
         ↓
-        
+
 Monitoring & Maintenance
 # Testing
 pytest
+
+# Docker
+
+## Prerequisites
+
+- Docker Desktop (Windows/macOS) or Docker Engine (Linux)
+- Docker Compose
+
+## Build the Docker Image
+
+```bash
+docker build -t omnibrain .
+```
+
+## Run the Test Container
+
+```bash
+docker run --rm omnibrain
+```
+
+## Run with Docker Compose
+
+```bash
+docker compose up
+```
+
+## Notes
+
+- Run all commands from the project root directory.
+- The current Docker configuration is intended for testing and development.
+- Docker Compose uses the `qa` service defined in `docker-compose.yml`.
