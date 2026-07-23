@@ -1,14 +1,20 @@
 from state import AgentState
+from langchain_config import get_llm
+
 
 def search_agent(state: AgentState) -> AgentState:
     """
     Search Agent
 
-    Responsible for semantic search and document retrieval.
+    Handles user queries using the configured LLM.
     """
 
     print("Search Agent Executed")
 
-    state["response"] = "Search Agent processed the query."
+    llm = get_llm()
+
+    response = llm.invoke(state["query"])
+
+    state["response"] = response.content
 
     return state
