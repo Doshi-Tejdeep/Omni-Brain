@@ -6,4 +6,3 @@ class AgentState(TypedDict):
     route: Literal["search", "sql", "vision", ""]
     context: str
     response: str
-    

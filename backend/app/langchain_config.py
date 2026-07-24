@@ -1,14 +1,14 @@
-"""
-Basic LangChain configuration.
-This file will be extended as the project grows.
-"""
-
-from langchain_core.prompts import PromptTemplate
+from langchain_ollama import ChatOllama
 
 
-def initialize_langchain():
-    return "LangChain environment initialized."
+def get_llm():
+    """
+    Returns the configured Ollama LLM.
+    """
 
+    llm = ChatOllama(
+        model="llama3.2",
+        temperature=0
+    )
 
-if __name__ == "__main__":
-    print(initialize_langchain())
+    return llm

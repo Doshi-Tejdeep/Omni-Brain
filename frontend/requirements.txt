@@ -1,2 +1,5 @@
 streamlit
+ docs/add-testing-guide
+
 requests
+main

@@ -1,33 +1,24 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI
+from app.utils.logger import logger
+from app.routes.health import router as health_router
+from app.routes.upload import router as upload_router
+from app.routes.ask import router as ask_router
 
-# Create FastAPI application
+import os
+
 app = FastAPI(
     title="OmniBrain Backend API",
     description="Backend API for OmniBrain Multi-Modal RAG Project",
     version="1.0.0"
 )
 
-# Root endpoint
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to OmniBrain Backend API"
-    }
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Backend server started")
 
-# Health endpoint
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy",
-        "message": "Backend is running successfully"
-    }
+UPLOAD_DIR = "storage/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
-# Upload endpoint
-@app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    return {
-        "filename": file.filename,
-        "content_type": file.content_type, 
-        "message": "File uploaded successfully"
-    }
+app.include_router(health_router)
+app.include_router(upload_router)
+app.include_router(ask_router)
