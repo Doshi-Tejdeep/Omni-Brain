@@ -66,13 +66,32 @@ class VectorStore:
 
         print(f"Stored {len(ids)} chunks successfully.")
 
-    def search(self, query):
+    def search(self, query, k=4):
         """
-        Perform similarity search.
+        Retrieve the most relevant chunks from ChromaDB.
         """
-        raise NotImplementedError(
-            "Vector DB search() not implemented yet."
+
+        if not self.connected:
+            self.connect()
+
+        results = self.vector_db.similarity_search(
+        query=query.strip(),
+        k=k,
+
         )
+
+        chunks = []
+
+        for doc in results:
+            chunks.append(
+                {
+                    "text": doc.page_content,
+                    "page_number": doc.metadata["page_number"],
+                    "chunk_id": doc.metadata["chunk_id"],
+                }
+            )
+
+        return chunks
 
     def delete_document(self, document_id):
         """
