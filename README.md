@@ -141,3 +141,7 @@ docker compose up
 - Run all commands from the project root directory.
 - The current Docker configuration is intended for testing and development.
 - Docker Compose uses the `qa` service defined in `docker-compose.yml`.
+
+## Additional Documentation
+
+- `docs/development-setup.md` – Local development environment setup.
