@@ -1,3 +1,4 @@
+from app.services.rag_service import generate_answer
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.utils.logger import logger
@@ -19,10 +20,12 @@ async def ask_question(request: QuestionRequest):
 
         logger.info(f"Question received: {request.question}")
 
+        answer = await generate_answer(request.question)
+
         return {
-            "question": request.question,
-            "answer": "Answer generation is under development."
-        }
+    "question": request.question,
+    "answer": answer
+}
 
     except HTTPException:
         raise
