@@ -216,3 +216,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Streamlit
+.streamlit/secrets.toml
+
+# -----------------------------
+# Omni-Brain Project
+# -----------------------------
+
+# Test files
+backend/**/test_*.py
+
+# ChromaDB generated files
+backend/chroma_db/*
+!backend/chroma_db/.gitkeep
