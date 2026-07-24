@@ -37,21 +37,19 @@ def chunk_pages(
     chunk_size: int = 500,
     overlap: int = 50,
 ) -> List[Dict]:
-    """Chunk extracted PDF pages while keeping page numbers."""
+    """Chunk extracted PDF pages while preserving page metadata."""
 
     chunked_pages = []
 
     for page in pages:
-        page_number = page["page_number"]
-        text = page["text"]
-
+        text = page.get("text", "")
         chunks = chunk_text(text, chunk_size, overlap)
 
-        for index, chunk in enumerate(chunks, start=1):
+        for index, chunk in enumerate(chunks):
             chunked_pages.append(
                 {
-                    "page_number": page_number,
-                    "chunk_number": index,
+                    "page": page.get("page"),
+                    "chunk_index": index,
                     "text": chunk,
                 }
             )
