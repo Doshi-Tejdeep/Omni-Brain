@@ -1,30 +1,57 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+"""Text chunking utilities for OmniBrain."""
+
+from typing import List, Dict
 
 
-def chunk_document(pages):
-    """
-    Splits extracted PDF pages into smaller chunks while
-    preserving page number metadata.
-    """
+def chunk_text(
+    text: str,
+    chunk_size: int = 500,
+    overlap: int = 50,
+) -> List[str]:
+    """Split text into overlapping chunks."""
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100,
-    )
+    if not text:
+        return []
+
+    if overlap >= chunk_size:
+        raise ValueError("overlap must be smaller than chunk_size")
 
     chunks = []
+    start = 0
+    text_length = len(text)
 
-    for page in pages:
-        page_number = page["page_number"]
-        text = page["text"]
+    while start < text_length:
+        end = start + chunk_size
+        chunk = text[start:end].strip()
 
-        split_texts = splitter.split_text(text)
+        if chunk:
+            chunks.append(chunk)
 
-        for i, chunk in enumerate(split_texts):
-            chunks.append({
-                "page_number": page_number,
-                "chunk_id": i + 1,
-                "text": chunk,
-            })
+        start += chunk_size - overlap
 
     return chunks
+
+
+def chunk_pages(
+    pages: List[Dict],
+    chunk_size: int = 500,
+    overlap: int = 50,
+) -> List[Dict]:
+    """Chunk extracted PDF pages while preserving page metadata."""
+
+    chunked_pages = []
+
+    for page in pages:
+        text = page.get("text", "")
+        chunks = chunk_text(text, chunk_size, overlap)
+
+        for index, chunk in enumerate(chunks):
+            chunked_pages.append(
+                {
+                    "page": page.get("page"),
+                    "chunk_index": index,
+                    "text": chunk,
+                }
+            )
+
+    return chunked_pages
