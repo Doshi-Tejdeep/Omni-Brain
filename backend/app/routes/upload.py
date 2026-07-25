@@ -8,7 +8,16 @@ router = APIRouter()
 UPLOAD_DIR = "storage/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@router.post("/upload")
+@router.post(
+    "/upload",
+    summary="Upload PDF",
+    description="Uploads a PDF file.",
+    responses={
+        200: {"description": "File uploaded successfully"},
+        400: {"description": "Invalid upload request"},
+        500: {"description": "Internal Server Error"}
+    }
+)
 async def upload_file(file: UploadFile = File(...)):
     try:
         logger.info(f"Upload request received: {file.filename}")
