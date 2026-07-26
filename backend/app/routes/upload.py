@@ -1,6 +1,6 @@
-from document_processing.index_document import index_document
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.utils.logger import logger
+from app.config import MAX_FILE_SIZE, ALLOWED_FILE_TYPES
 import os
 import shutil
 
@@ -22,8 +22,13 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 async def upload_file(file: UploadFile = File(...)):
     try:
         logger.info(f"Upload request received: {file.filename}")
+        if not file.filename.lower().endswith(".pdf"):
+         raise HTTPException(
+        status_code=400,
+        detail="Invalid filename."
+    )
 
-        if file.content_type != "application/pdf":
+        if file.content_type not in ALLOWED_FILE_TYPES:
             logger.warning(f"Invalid file uploaded: {file.filename}")
             raise HTTPException(
                 status_code=400,
@@ -39,9 +44,9 @@ async def upload_file(file: UploadFile = File(...)):
                 detail="Uploaded file is empty."
             )
 
-        MAX_SIZE = 10 * 1024 * 1024
+        
 
-        if len(content) > MAX_SIZE:
+        if len(content) > MAX_FILE_SIZE:
             logger.warning(f"File too large: {file.filename}")
             raise HTTPException(
                 status_code=400,
@@ -50,17 +55,17 @@ async def upload_file(file: UploadFile = File(...)):
 
         await file.seek(0)
 
-        file_path = os.path.join(UPLOAD_DIR, file.filename)
+        safe_filename = os.path.basename(file.filename)
+
+        file_path = os.path.join(  
+    UPLOAD_DIR,
+    safe_filename
+)
 
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         logger.info(f"{file.filename} stored at {file_path}")
-        logger.info("Indexing document...")
-
-        index_document(file_path)
-
-        logger.info("Document indexed successfully.")
         logger.info(f"{file.filename} uploaded successfully")
 
         return {
