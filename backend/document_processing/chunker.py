@@ -47,9 +47,9 @@ def chunk_pages(
 
         for index, chunk in enumerate(chunks):
             chunked_pages.append(
-                             {
-                    "page_number": page.get("page_number"),
-                    "chunk_id": index,
+                {
+                    "page": page.get("page"),
+                    "chunk_index": index,
                     "text": chunk,
                 }
             )
