@@ -8,12 +8,11 @@ import uuid
 
 from langchain_chroma import Chroma
 
-from backend.vector_db.embeddings import get_embeddings
-from backend.vector_db.config import (
+from vector_db.embeddings import get_embeddings
+from vector_db.config import (
     COLLECTION_NAME,
     CHROMA_DB_PATH,
 )
-
 
 class VectorStore:
     def __init__(self):

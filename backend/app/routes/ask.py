@@ -38,12 +38,13 @@ async def ask_question(request: QuestionRequest):
         logger.info(f"Question received: {request.question}")
 
         # Generate answer using RAG service
-        answer = await generate_answer(request.question)
+        result = await generate_answer(request.question)
 
         # Return response
         return {
             "question": request.question,
-            "answer": answer
+            "answer": result["answer"],
+            "sources": result["sources"]
         }
 
     except HTTPException:

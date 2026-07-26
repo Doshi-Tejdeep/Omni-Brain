@@ -1,3 +1,4 @@
+from document_processing.index_document import index_document
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.utils.logger import logger
 import os
@@ -55,6 +56,11 @@ async def upload_file(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         logger.info(f"{file.filename} stored at {file_path}")
+        logger.info("Indexing document...")
+
+        index_document(file_path)
+
+        logger.info("Document indexed successfully.")
         logger.info(f"{file.filename} uploaded successfully")
 
         return {
