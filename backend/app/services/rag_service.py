@@ -14,6 +14,7 @@ async def generate_answer(question: str):
     """
 
     logger.info(f"Generating answer for: {question}")
+    logger.info(f"Retrieved {len(chunks)} chunks from vector store")
 
     vector_store = VectorStore()
 
