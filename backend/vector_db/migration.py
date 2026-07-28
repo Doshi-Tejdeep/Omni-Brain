@@ -1,39 +1,22 @@
 """
-Database Migration Utilities
+Database migration utility.
 
-This file is a placeholder for database migrations.
-
-Future Improvements:
-- Integrate Alembic for version-controlled migrations.
-- Add schema upgrade and downgrade support.
-- Automate migration execution during deployment.
+Creates all database tables defined in models.py.
 """
 
 from .database import Base, engine
 
+# Import models so SQLAlchemy registers them
+from .models import Document, History
 
-def create_tables():
+
+def run_migration():
     """
-    Create all database tables.
-
-    Currently uses SQLAlchemy's create_all().
-    This will later be replaced with proper migrations.
+    Creates all tables in the database.
     """
     Base.metadata.create_all(bind=engine)
-    print("Database tables created successfully.")
-
-
-def drop_tables():
-    """
-    Drop all database tables.
-
-    Useful during development and testing.
-    """
-    Base.metadata.drop_all(bind=engine)
-    print("Database tables dropped successfully.")
+    print("Database migration completed successfully.")
 
 
 if __name__ == "__main__":
-    create_tables()
-
-Base.metadata.create_all(bind=engine)
+    run_migration()

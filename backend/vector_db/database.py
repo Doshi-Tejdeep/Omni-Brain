@@ -1,8 +1,5 @@
 """
-Database connection setup for the Vector Database.
-"""
-"""
-Database connection setup.
+Database connection setup using SQLAlchemy.
 """
 
 from sqlalchemy import create_engine
@@ -22,3 +19,16 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
+
+def get_db():
+    """
+    Provides a database session.
+    """
+
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
