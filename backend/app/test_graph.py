@@ -2,7 +2,7 @@ from graph import graph
 
 # Initial state
 initial_state = {
-    "query": "Analyze this chart",
+    "query": "What is Artificial Intelligence?",
     "route": "",
     "context": "",
     "response": ""

@@ -11,45 +11,45 @@ Member 5: Database: SQLite/PostgreSQL schema, metadata tables, ORM models.
 Member 6: DevOps/QA: Dockerfile, docker-compose, pre-commit, pytest setup, GitHub Actions skeleton.
 
 Daily Commit Plan (5 Days)
-Day 1: 
+Day 1:
   Lead: repo+README.
-  M1 FastAPI app. 
-  M2 Streamlit app. 
-  M3 parser folders. 
-  M4 LangChain env. 
-  M5 DB schema. 
+  M1 FastAPI app.
+  M2 Streamlit app.
+  M3 parser folders.
+  M4 LangChain env.
+  M5 DB schema.
   M6 Dockerfile.
-Day 2: 
+Day 2:
   Lead:architecture doc.
-  M1 upload API. 
-  M2 upload UI. 
-  M3 text extraction. 
-  M4 prompt templates. 
-  M5 ORM models. 
+  M1 upload API.
+  M2 upload UI.
+  M3 text extraction.
+  M4 prompt templates.
+  M5 ORM models.
   M6 docker-compose.
-Day 3: 
-  Lead: review/integration. 
-  M1 API validation. 
-  M2 response page. 
-  M3 chunking. 
-  M4 workflow diagrams. 
-  M5 metadata CRUD. 
+Day 3:
+  Lead: review/integration.
+  M1 API validation.
+  M2 response page.
+  M3 chunking.
+  M4 workflow diagrams.
+  M5 metadata CRUD.
   M6 pytest.
-Day 4: 
-  Lead: coding standards. 
-  M1 logging. 
-  M2 sidebar/history. 
-  M3 table extraction. 
-  M4 agent interfaces. 
-  M5 migrations. 
+Day 4:
+  Lead: coding standards.
+  M1 logging.
+  M2 sidebar/history.
+  M3 table extraction.
+  M4 agent interfaces.
+  M5 migrations.
   M6 GitHub Actions.
-Day 5: 
-  Lead: merge/release. 
-  M1 API docs. 
-  M2 UI polish. 
-  M3 image extraction. 
-  M4 config. 
-  M5 seed data. 
+Day 5:
+  Lead: merge/release.
+  M1 API docs.
+  M2 UI polish.
+  M3 image extraction.
+  M4 config.
+  M5 seed data.
   M6 integration tests.
 
 Git Branches
