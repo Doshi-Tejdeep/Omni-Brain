@@ -1,12 +1,16 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.utils.logger import logger
-from app.config import MAX_FILE_SIZE, ALLOWED_FILE_TYPES
+from app.config import (
+    MAX_FILE_SIZE,
+    ALLOWED_FILE_TYPES,
+    UPLOAD_DIR,
+)
 import os
 import shutil
 
 router = APIRouter()
 
-UPLOAD_DIR = "storage/uploads"
+
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post(
@@ -24,8 +28,8 @@ async def upload_file(file: UploadFile = File(...)):
         logger.info(f"Upload request received: {file.filename}")
         if not file.filename.lower().endswith(".pdf"):
             raise HTTPException(
-               status_code=400,
-               detail="Invalid filename."
+        status_code=400,
+        detail="Invalid filename."
     )
 
         if file.content_type not in ALLOWED_FILE_TYPES:
