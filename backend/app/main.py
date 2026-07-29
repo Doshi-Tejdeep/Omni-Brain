@@ -29,6 +29,7 @@ async def startup_event():
 
 UPLOAD_DIR = "storage/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 app.include_router(health_router)
 app.include_router(upload_router)
 app.include_router(ask_router)
