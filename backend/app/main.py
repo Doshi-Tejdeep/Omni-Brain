@@ -4,6 +4,7 @@ from app.utils.logger import logger
 from app.routes.health import router as health_router
 from app.routes.upload import router as upload_router
 from app.routes.ask import router as ask_router
+from app.config import UPLOAD_DIR
 import os
 
 
@@ -27,9 +28,8 @@ app.add_middleware(
 async def startup_event():
     logger.info("Backend server started")
 
-UPLOAD_DIR = "storage/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.include_router(health_router)
 app.include_router(upload_router)
 app.include_router(ask_router)
