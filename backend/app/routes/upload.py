@@ -23,9 +23,9 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         logger.info(f"Upload request received: {file.filename}")
         if not file.filename.lower().endswith(".pdf"):
-         raise HTTPException(
-        status_code=400,
-        detail="Invalid filename."
+            raise HTTPException(
+               status_code=400,
+               detail="Invalid filename."
     )
 
         if file.content_type not in ALLOWED_FILE_TYPES:
