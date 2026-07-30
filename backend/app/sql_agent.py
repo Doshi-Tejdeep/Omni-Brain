@@ -1,5 +1,6 @@
 from state import AgentState
 
+
 def sql_agent(state: AgentState) -> AgentState:
     """
     SQL Agent

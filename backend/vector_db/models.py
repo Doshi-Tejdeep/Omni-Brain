@@ -4,19 +4,6 @@ Database models (Day 7 - History)
 
 from datetime import datetime
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Text,
-    DateTime,
-)
-
-from .database import Base
-
-
-from datetime import datetime
-
 from sqlalchemy import Column, DateTime, Integer, String, Text
 
 from .database import Base
@@ -30,24 +17,24 @@ class Document(Base):
     filename = Column(
         String,
         nullable=False,
-        index=True
+        index=True,
     )
 
     upload_time = Column(
         DateTime,
         default=datetime.utcnow,
-        index=True
+        index=True,
     )
 
     status = Column(
         String,
         default="uploaded",
-        index=True
+        index=True,
     )
 
     page_count = Column(
         Integer,
-        default=0
+        default=0,
     )
 
 
@@ -63,7 +50,5 @@ class History(Base):
     created_at = Column(
         DateTime,
         default=datetime.utcnow,
-        index=True
+        index=True,
     )
-
-
