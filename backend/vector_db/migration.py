@@ -1,22 +1,18 @@
 """
 Database migration utility.
-
-Creates all database tables defined in models.py.
 """
 
 from .database import Base, engine
-
-# Import models so SQLAlchemy registers them
-from .models import Document, History
+from . import models
 
 
-def run_migration():
+def create_tables():
     """
-    Creates all tables in the database.
+    Create all database tables and indexes.
     """
     Base.metadata.create_all(bind=engine)
-    print("Database migration completed successfully.")
+    print("Database tables created successfully.")
 
 
 if __name__ == "__main__":
-    run_migration()
+    create_tables()

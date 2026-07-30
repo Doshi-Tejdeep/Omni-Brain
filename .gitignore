@@ -230,3 +230,6 @@ backend/**/test_*.py
 # ChromaDB generated files
 backend/chroma_db/*
 !backend/chroma_db/.gitkeep
+
+# SQLite database
+omnibrain.db
