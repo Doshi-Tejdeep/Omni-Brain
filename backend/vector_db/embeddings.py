@@ -17,5 +17,23 @@ class EmbeddingGenerator:
         """
         Convert text into a vector embedding.
         """
-        embedding = self.model.encode(text)
-        return embedding.tolist()
+        return self.model.encode(text).tolist()
+
+    def embed_query(self, text: str):
+        """
+        Generate embedding for a search query.
+        """
+        return self.model.encode(text).tolist()
+
+    def embed_documents(self, texts):
+        """
+        Generate embeddings for multiple documents.
+        """
+        return [self.model.encode(text).tolist() for text in texts]
+
+
+def get_embeddings():
+    """
+    Return the embedding generator instance.
+    """
+    return EmbeddingGenerator()
