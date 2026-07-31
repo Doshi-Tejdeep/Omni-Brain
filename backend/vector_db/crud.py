@@ -2,7 +2,7 @@
 CRUD operations for the Vector Database module.
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as DBSession
 
 from .models import Document, History
 
@@ -11,14 +11,14 @@ from .models import Document, History
 # DOCUMENT CRUD
 # ==========================
 
-def create_document(db: Session, document: Document):
+def create_document(db: DBSession, document: Document):
     db.add(document)
     db.commit()
     db.refresh(document)
     return document
 
 
-def get_document(db: Session, document_id: int):
+def get_document(db: DBSession, document_id: int):
     return (
         db.query(Document)
         .filter(Document.id == document_id)
@@ -26,11 +26,11 @@ def get_document(db: Session, document_id: int):
     )
 
 
-def get_all_documents(db: Session):
+def get_all_documents(db: DBSession):
     return db.query(Document).all()
 
 
-def update_document(db: Session, document_id: int, **kwargs):
+def update_document(db: DBSession, document_id: int, **kwargs):
     document = (
         db.query(Document)
         .filter(Document.id == document_id)
@@ -49,7 +49,7 @@ def update_document(db: Session, document_id: int, **kwargs):
     return document
 
 
-def delete_document(db: Session, document_id: int):
+def delete_document(db: DBSession, document_id: int):
     document = (
         db.query(Document)
         .filter(Document.id == document_id)
@@ -69,18 +69,18 @@ def delete_document(db: Session, document_id: int):
 # HISTORY CRUD
 # ==========================
 
-def create_history(db: Session, history: History):
+def create_history(db: DBSession, history: History):
     db.add(history)
     db.commit()
     db.refresh(history)
     return history
 
 
-def get_history(db: Session):
+def get_history(db: DBSession):
     return db.query(History).all()
 
 
-def get_history_by_id(db: Session, history_id: int):
+def get_history_by_id(db: DBSession, history_id: int):
     return (
         db.query(History)
         .filter(History.id == history_id)
@@ -88,7 +88,7 @@ def get_history_by_id(db: Session, history_id: int):
     )
 
 
-def delete_history(db: Session, history_id: int):
+def delete_history(db: DBSession, history_id: int):
     history = (
         db.query(History)
         .filter(History.id == history_id)
@@ -102,3 +102,48 @@ def delete_history(db: Session, history_id: int):
     db.commit()
 
     return history
+
+# ==========================
+# SESSION CRUD
+# ==========================
+
+from .models import Session
+
+
+# CREATE SESSION
+def create_session(db: Session, session: Session):
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
+
+
+# GET SESSION BY SESSION_ID
+def get_session(db: Session, session_id: str):
+    return (
+        db.query(Session)
+        .filter(Session.session_id == session_id)
+        .first()
+    )
+
+
+# GET ALL SESSIONS
+def get_all_sessions(db: Session):
+    return db.query(Session).all()
+
+
+# DELETE SESSION
+def delete_session(db: Session, session_id: str):
+    session = (
+        db.query(Session)
+        .filter(Session.session_id == session_id)
+        .first()
+    )
+
+    if not session:
+        return None
+
+    db.delete(session)
+    db.commit()
+
+    return session
