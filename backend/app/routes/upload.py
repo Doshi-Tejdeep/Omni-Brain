@@ -10,8 +10,8 @@ import shutil
 
 router = APIRouter()
 
-
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 @router.post(
     "/upload",
@@ -20,23 +20,21 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
     responses={
         200: {"description": "File uploaded successfully"},
         400: {"description": "Invalid upload request"},
-        500: {"description": "Internal Server Error"}
-    }
+        500: {"description": "Internal Server Error"},
+    },
 )
 async def upload_file(file: UploadFile = File(...)):
     try:
         logger.info(f"Upload request received: {file.filename}")
+
         if not file.filename.lower().endswith(".pdf"):
-            raise HTTPException(
-        status_code=400,
-        detail="Invalid filename."
-    )
+            raise HTTPException(status_code=400, detail="Invalid filename.")
 
         if file.content_type not in ALLOWED_FILE_TYPES:
             logger.warning(f"Invalid file uploaded: {file.filename}")
             raise HTTPException(
                 status_code=400,
-                detail="Only PDF files are allowed."
+                detail="Only PDF files are allowed.",
             )
 
         content = await file.read()
@@ -45,26 +43,20 @@ async def upload_file(file: UploadFile = File(...)):
             logger.warning(f"Empty file uploaded: {file.filename}")
             raise HTTPException(
                 status_code=400,
-                detail="Uploaded file is empty."
+                detail="Uploaded file is empty.",
             )
-
-        
 
         if len(content) > MAX_FILE_SIZE:
             logger.warning(f"File too large: {file.filename}")
             raise HTTPException(
                 status_code=400,
-                detail="File size exceeds 10MB."
+                detail="File size exceeds 10MB.",
             )
 
         await file.seek(0)
 
         safe_filename = os.path.basename(file.filename)
-
-        file_path = os.path.join(  
-    UPLOAD_DIR,
-    safe_filename
-)
+        file_path = os.path.join(UPLOAD_DIR, safe_filename)
 
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -76,7 +68,7 @@ async def upload_file(file: UploadFile = File(...)):
             "message": "File uploaded successfully",
             "filename": file.filename,
             "content_type": file.content_type,
-            "path": file_path
+            "path": file_path,
         }
 
     except HTTPException:
@@ -86,5 +78,5 @@ async def upload_file(file: UploadFile = File(...)):
         logger.error(f"Upload failed: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail="Internal Server Error"
+            detail="Internal Server Error",
         )

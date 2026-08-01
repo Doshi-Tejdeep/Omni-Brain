@@ -3,6 +3,7 @@ from document_processing.chunker import chunk_pages
 from vector_db.embeddings import get_embeddings
 from vector_db.vector_store import VectorStore
 
+
 def index_document(pdf_path):
     """
     Extract text from a PDF, split it into chunks,

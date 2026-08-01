@@ -14,47 +14,32 @@ async def generate_answer(question: str):
     """
 
     logger.info(f"Generating answer for: {question}")
-    logger.info(f"Retrieved {len(chunks)} chunks from vector store")
-
     vector_store = VectorStore()
-
     # Retrieve relevant chunks
     chunks = vector_store.search(question, k=4)
+    logger.info(f"Retrieved {len(chunks)} chunks from vector store")
 
     if not chunks:
         return {
             "answer": "I could not find the answer in the provided documents.",
-            "sources": []
+            "sources": [],
         }
 
     # Build context
     context = "\n\n".join(chunk["text"] for chunk in chunks)
 
     # Build prompt
-    prompt = SEARCH_PROMPT.format(
-        context=context,
-        question=question
-    )
+    prompt = SEARCH_PROMPT.format(context=context, question=question)
 
     llm = get_llm()
 
     response = llm.invoke(prompt)
 
-    answer = (
-        response.content
-        if hasattr(response, "content")
-        else str(response)
-    )
+    answer = response.content if hasattr(response, "content") else str(response)
 
-    sources = [
-        f"Page {chunk['page_number']}"
-        for chunk in chunks
-    ]
+    sources = [f"Page {chunk['page_number']}" for chunk in chunks]
 
     # Remove duplicate page numbers
     sources = list(dict.fromkeys(sources))
 
-    return {
-        "answer": answer,
-        "sources": sources
-    }
+    return {"answer": answer, "sources": sources}

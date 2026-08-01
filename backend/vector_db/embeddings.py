@@ -1,21 +1,10 @@
-"""
-Embedding generation utilities.
-"""
-
-from sentence_transformers import SentenceTransformer
+from langchain_ollama import OllamaEmbeddings
 
 
-class EmbeddingGenerator:
+def get_embeddings():
     """
-    Generates vector embeddings from text.
+    Returns the embedding model used
+    throughout the RAG pipeline.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(model_name)
-
-    def generate_embedding(self, text: str):
-        """
-        Convert text into a vector embedding.
-        """
-        embedding = self.model.encode(text)
-        return embedding.tolist()
+    return OllamaEmbeddings(model="nomic-embed-text")

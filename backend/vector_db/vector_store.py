@@ -14,6 +14,7 @@ from vector_db.config import (
     CHROMA_DB_PATH,
 )
 
+
 class VectorStore:
     def __init__(self):
         self.connected = False
@@ -50,10 +51,9 @@ class VectorStore:
             ids.append(str(uuid.uuid4()))
             texts.append(chunk["text"])
             embeddings.append(chunk["embedding"])
-            metadatas.append({
-                "page_number": chunk["page_number"],
-                "chunk_id": chunk["chunk_id"]
-            })
+            metadatas.append(
+                {"page_number": chunk["page_number"], "chunk_id": chunk["chunk_id"]}
+            )
 
         # Access the underlying Chroma collection
         self.vector_db._collection.add(
@@ -74,9 +74,8 @@ class VectorStore:
             self.connect()
 
         results = self.vector_db.similarity_search(
-        query=query.strip(),
-        k=k,
-
+            query=query.strip(),
+            k=k,
         )
 
         chunks = []
@@ -96,6 +95,4 @@ class VectorStore:
         """
         Delete document embeddings.
         """
-        raise NotImplementedError(
-            "Vector DB delete_document() not implemented yet."
-        )
+        raise NotImplementedError("Vector DB delete_document() not implemented yet.")

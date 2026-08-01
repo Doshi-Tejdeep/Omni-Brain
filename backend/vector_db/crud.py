@@ -11,6 +11,7 @@ from .models import Document, History
 # DOCUMENT CRUD
 # ==========================
 
+
 def create_document(db: Session, document: Document):
     db.add(document)
     db.commit()
@@ -19,11 +20,7 @@ def create_document(db: Session, document: Document):
 
 
 def get_document(db: Session, document_id: int):
-    return (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    return db.query(Document).filter(Document.id == document_id).first()
 
 
 def get_all_documents(db: Session):
@@ -31,11 +28,7 @@ def get_all_documents(db: Session):
 
 
 def update_document(db: Session, document_id: int, **kwargs):
-    document = (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    document = db.query(Document).filter(Document.id == document_id).first()
 
     if not document:
         return None
@@ -50,11 +43,7 @@ def update_document(db: Session, document_id: int, **kwargs):
 
 
 def delete_document(db: Session, document_id: int):
-    document = (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    document = db.query(Document).filter(Document.id == document_id).first()
 
     if not document:
         return None
@@ -69,6 +58,7 @@ def delete_document(db: Session, document_id: int):
 # HISTORY CRUD
 # ==========================
 
+
 def create_history(db: Session, history: History):
     db.add(history)
     db.commit()
@@ -81,19 +71,11 @@ def get_history(db: Session):
 
 
 def get_history_by_id(db: Session, history_id: int):
-    return (
-        db.query(History)
-        .filter(History.id == history_id)
-        .first()
-    )
+    return db.query(History).filter(History.id == history_id).first()
 
 
 def delete_history(db: Session, history_id: int):
-    history = (
-        db.query(History)
-        .filter(History.id == history_id)
-        .first()
-    )
+    history = db.query(History).filter(History.id == history_id).first()
 
     if not history:
         return None

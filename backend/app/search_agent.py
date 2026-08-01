@@ -22,10 +22,7 @@ def search_agent(state: AgentState) -> AgentState:
     chunks = db.search(state["query"])
 
     # Build RAG prompt
-    prompt = build_search_prompt(
-        chunks,
-        state["query"]
-    )
+    prompt = build_search_prompt(chunks, state["query"])
 
     # Generate response
     llm = get_llm()

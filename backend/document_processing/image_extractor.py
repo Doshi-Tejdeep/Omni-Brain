@@ -29,9 +29,7 @@ def extract_images_from_pdf(pdf_path: str, output_dir: str) -> list[dict]:
                 image_bytes = image_data["image"]
                 extension = image_data["ext"]
 
-                filename = (
-                    f"page_{page_number}_image_{image_number}.{extension}"
-                )
+                filename = f"page_{page_number}_image_{image_number}.{extension}"
 
                 image_path = output_path / filename
 

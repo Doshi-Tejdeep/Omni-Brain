@@ -13,9 +13,7 @@ app = FastAPI(
     title="OmniBrain Backend API",
     description="Backend API for the OmniBrain Multi-Modal RAG Project.",
     version="1.0.0",
-    contact={
-        "name": "OmniBrain Backend Team"
-    }
+    contact={"name": "OmniBrain Backend Team"},
 )
 app.add_middleware(
     CORSMiddleware,
@@ -24,16 +22,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @app.on_event("startup")
 async def startup_event():
     logger.info("Backend server started")
 
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 app.include_router(health_router)
 app.include_router(upload_router)
 app.include_router(ask_router)
-
-
-
-
