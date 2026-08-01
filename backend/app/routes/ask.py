@@ -8,9 +8,7 @@ router = APIRouter()
 
 class QuestionRequest(BaseModel):
     question: str = Field(
-        ...,
-        description="Question asked by the user",
-        example="What is OmniBrain?"
+        ..., description="Question asked by the user", example="What is OmniBrain?"
     )
 
 
@@ -21,18 +19,15 @@ class QuestionRequest(BaseModel):
     responses={
         200: {"description": "Answer generated successfully"},
         400: {"description": "Invalid question"},
-        500: {"description": "Internal Server Error"}
-    }
+        500: {"description": "Internal Server Error"},
+    },
 )
 async def ask_question(request: QuestionRequest):
     try:
 
         # Validate question
         if not request.question.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Question cannot be empty."
-            )
+            raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
         # Log incoming request
         logger.info(f"Question received: {request.question}")
@@ -44,7 +39,7 @@ async def ask_question(request: QuestionRequest):
         return {
             "question": request.question,
             "answer": result["answer"],
-            "sources": result["sources"]
+            "sources": result["sources"],
         }
 
     except HTTPException:
@@ -53,7 +48,4 @@ async def ask_question(request: QuestionRequest):
     except Exception as e:
         logger.error(f"Ask API failed: {str(e)}")
 
-        raise HTTPException(
-            status_code=500,
-            detail="Internal Server Error"
-        )
+        raise HTTPException(status_code=500, detail="Internal Server Error")

@@ -11,6 +11,7 @@ from pydantic import BaseModel
 # Document Schemas
 # -------------------------
 
+
 class DocumentBase(BaseModel):
     filename: str
     status: str = "uploaded"
@@ -32,6 +33,7 @@ class DocumentResponse(DocumentBase):
 # -------------------------
 # History Schemas
 # -------------------------
+
 
 class HistoryBase(BaseModel):
     session_id: str

@@ -12,6 +12,8 @@ from .models import Document, History
 # ==========================
 
 def create_document(db: DBSession, document: Document):
+
+def create_document(db: Session, document: Document):
     db.add(document)
     db.commit()
     db.refresh(document)
@@ -24,6 +26,8 @@ def get_document(db: DBSession, document_id: int):
         .filter(Document.id == document_id)
         .first()
     )
+def get_document(db: Session, document_id: int):
+    return db.query(Document).filter(Document.id == document_id).first()
 
 
 def get_all_documents(db: DBSession):
@@ -36,6 +40,8 @@ def update_document(db: DBSession, document_id: int, **kwargs):
         .filter(Document.id == document_id)
         .first()
     )
+def update_document(db: Session, document_id: int, **kwargs):
+    document = db.query(Document).filter(Document.id == document_id).first()
 
     if not document:
         return None
@@ -55,6 +61,8 @@ def delete_document(db: DBSession, document_id: int):
         .filter(Document.id == document_id)
         .first()
     )
+def delete_document(db: Session, document_id: int):
+    document = db.query(Document).filter(Document.id == document_id).first()
 
     if not document:
         return None
@@ -70,6 +78,8 @@ def delete_document(db: DBSession, document_id: int):
 # ==========================
 
 def create_history(db: DBSession, history: History):
+
+def create_history(db: Session, history: History):
     db.add(history)
     db.commit()
     db.refresh(history)
@@ -94,6 +104,12 @@ def delete_history(db: DBSession, history_id: int):
         .filter(History.id == history_id)
         .first()
     )
+def get_history_by_id(db: Session, history_id: int):
+    return db.query(History).filter(History.id == history_id).first()
+
+
+def delete_history(db: Session, history_id: int):
+    history = db.query(History).filter(History.id == history_id).first()
 
     if not history:
         return None
