@@ -8,7 +8,7 @@ def index_document(pdf_path):
     """
     Extract text from a PDF, split it into chunks,
     generate embeddings for each chunk,
-    and return the embedded chunks.
+    and store them in ChromaDB.
     """
 
     pages = extract_text_from_pdf(pdf_path)

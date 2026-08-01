@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from document_processing.index_document import index_document
 from app.utils.logger import logger
 from app.config import (
     MAX_FILE_SIZE,
@@ -62,8 +63,14 @@ async def upload_file(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         logger.info(f"{file.filename} stored at {file_path}")
-        logger.info(f"{file.filename} uploaded successfully")
 
+        logger.info("Indexing uploaded document...")
+
+        index_document(file_path)
+
+        logger.info("Document indexed successfully.")
+
+        logger.info(f"{file.filename} uploaded successfully")
         return {
             "message": "File uploaded successfully",
             "filename": file.filename,

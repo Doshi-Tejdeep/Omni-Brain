@@ -48,4 +48,9 @@ async def ask_question(request: QuestionRequest):
     except Exception as e:
         logger.error(f"Ask API failed: {str(e)}")
 
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal Server Error",
+        )
+
+        

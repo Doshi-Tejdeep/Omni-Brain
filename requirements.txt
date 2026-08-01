@@ -1,0 +1,29 @@
+# Backend
+fastapi
+uvicorn
+pydantic
+python-multipart
+
+# LangChain / RAG
+langchain
+langchain-core
+langchain-ollama
+langchain-chroma
+
+# Vector Database
+chromadb
+
+# Embeddings / LLM
+ollama
+
+# PDF Processing
+PyMuPDF
+
+# OCR
+pytesseract
+
+# Environment Variables
+python-dotenv
+
+# HTTP
+requests

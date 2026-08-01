@@ -742,7 +742,7 @@ if st.session_state.is_uploading and st.session_state.pending_file_bytes is not 
         response = requests.post(
             UPLOAD_URL,
             files={"file": (file_name, file_bytes, file_type)},
-            timeout=30,
+            timeout=120,
         )
 
         # ---- Processing ----
@@ -865,4 +865,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-main
+
