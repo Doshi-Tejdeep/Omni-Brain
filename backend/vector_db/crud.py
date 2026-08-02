@@ -150,3 +150,49 @@ def delete_chat_history(db: DBSession, session_id: str):
 
     db.commit()
     return True
+
+# ==========================
+# CONVERSATION MANAGEMENT
+# ==========================
+
+def rename_session(db: DBSession, session_id: str, new_title: str):
+    session = (
+        db.query(Session)
+        .filter(Session.session_id == session_id)
+        .first()
+    )
+
+    if not session:
+        return None
+
+    session.title = new_title
+
+    db.commit()
+    db.refresh(session)
+
+    return session
+
+
+def get_recent_sessions(db: DBSession, limit: int = 10):
+    return (
+        db.query(Session)
+        .order_by(Session.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def delete_conversation(db: DBSession, session_id: str):
+    delete_chat_history(db, session_id)
+
+    session = (
+        db.query(Session)
+        .filter(Session.session_id == session_id)
+        .first()
+    )
+
+    if session:
+        db.delete(session)
+        db.commit()
+
+    return True
