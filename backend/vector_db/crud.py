@@ -4,7 +4,7 @@ CRUD operations for the Vector Database module.
 
 from sqlalchemy.orm import Session as DBSession
 
-from .models import Document, History
+from .models import Document, History, Session
 
 
 # ==========================
@@ -19,11 +19,7 @@ def create_document(db: DBSession, document: Document):
 
 
 def get_document(db: DBSession, document_id: int):
-    return (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    return db.query(Document).filter(Document.id == document_id).first()
 
 
 def get_all_documents(db: DBSession):
@@ -31,11 +27,7 @@ def get_all_documents(db: DBSession):
 
 
 def update_document(db: DBSession, document_id: int, **kwargs):
-    document = (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    document = get_document(db, document_id)
 
     if not document:
         return None
@@ -45,23 +37,17 @@ def update_document(db: DBSession, document_id: int, **kwargs):
 
     db.commit()
     db.refresh(document)
-
     return document
 
 
 def delete_document(db: DBSession, document_id: int):
-    document = (
-        db.query(Document)
-        .filter(Document.id == document_id)
-        .first()
-    )
+    document = get_document(db, document_id)
 
     if not document:
         return None
 
     db.delete(document)
     db.commit()
-
     return document
 
 
@@ -81,45 +67,32 @@ def get_history(db: DBSession):
 
 
 def get_history_by_id(db: DBSession, history_id: int):
-    return (
-        db.query(History)
-        .filter(History.id == history_id)
-        .first()
-    )
+    return db.query(History).filter(History.id == history_id).first()
 
 
 def delete_history(db: DBSession, history_id: int):
-    history = (
-        db.query(History)
-        .filter(History.id == history_id)
-        .first()
-    )
+    history = get_history_by_id(db, history_id)
 
     if not history:
         return None
 
     db.delete(history)
     db.commit()
-
     return history
+
 
 # ==========================
 # SESSION CRUD
 # ==========================
 
-from .models import Session
-
-
-# CREATE SESSION
-def create_session(db: Session, session: Session):
+def create_session(db: DBSession, session: Session):
     db.add(session)
     db.commit()
     db.refresh(session)
     return session
 
 
-# GET SESSION BY SESSION_ID
-def get_session(db: Session, session_id: str):
+def get_session(db: DBSession, session_id: str):
     return (
         db.query(Session)
         .filter(Session.session_id == session_id)
@@ -127,35 +100,25 @@ def get_session(db: Session, session_id: str):
     )
 
 
-# GET ALL SESSIONS
-def get_all_sessions(db: Session):
+def get_all_sessions(db: DBSession):
     return db.query(Session).all()
 
 
-# DELETE SESSION
-def delete_session(db: Session, session_id: str):
-    session = (
-        db.query(Session)
-        .filter(Session.session_id == session_id)
-        .first()
-    )
+def delete_session(db: DBSession, session_id: str):
+    session = get_session(db, session_id)
 
     if not session:
         return None
 
     db.delete(session)
     db.commit()
+    return session
 
-    return Session
 
 # ==========================
 # CHAT HISTORY CRUD
 # ==========================
 
-from .models import History
-
-
-# CREATE CHAT MESSAGE
 def create_chat_history(db: DBSession, history: History):
     db.add(history)
     db.commit()
@@ -163,7 +126,6 @@ def create_chat_history(db: DBSession, history: History):
     return history
 
 
-# GET CHAT HISTORY FOR A SESSION
 def get_chat_history(db: DBSession, session_id: str):
     return (
         db.query(History)
@@ -173,7 +135,6 @@ def get_chat_history(db: DBSession, session_id: str):
     )
 
 
-# DELETE ALL HISTORY OF A SESSION
 def delete_chat_history(db: DBSession, session_id: str):
     history = (
         db.query(History)
@@ -188,5 +149,4 @@ def delete_chat_history(db: DBSession, session_id: str):
         db.delete(message)
 
     db.commit()
-
     return True

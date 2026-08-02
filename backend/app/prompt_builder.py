@@ -9,10 +9,7 @@ def build_context(chunks):
     context = []
 
     for chunk in chunks:
-        context.append(
-            f"[Page {chunk['page_number']}]\n"
-            f"{chunk['text']}"
-        )
+        context.append(f"[Page {chunk['page_number']}]\n" f"{chunk['text']}")
 
     return "\n\n".join(context)
 
@@ -24,9 +21,6 @@ def build_search_prompt(chunks, question):
 
     context = build_context(chunks)
 
-    prompt = SEARCH_PROMPT.format(
-        context=context,
-        question=question
-    )
+    prompt = SEARCH_PROMPT.format(context=context, question=question)
 
     return prompt

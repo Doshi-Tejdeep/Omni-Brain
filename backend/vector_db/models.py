@@ -1,24 +1,17 @@
 """
-Database models (Day 7 - History)
+Database models
 """
 
 from datetime import datetime
 
 from sqlalchemy import (
     Column,
+    DateTime,
+    ForeignKey,
     Integer,
     String,
     Text,
-    DateTime,
-    ForeignKey,
 )
-
-from .database import Base
-
-
-from datetime import datetime
-
-from sqlalchemy import Column, DateTime, Integer, String, Text
 
 from .database import Base
 
@@ -31,24 +24,47 @@ class Document(Base):
     filename = Column(
         String,
         nullable=False,
-        index=True
+        index=True,
     )
 
     upload_time = Column(
         DateTime,
         default=datetime.utcnow,
-        index=True
+        index=True,
     )
 
     status = Column(
         String,
         default="uploaded",
-        index=True
+        index=True,
     )
 
     page_count = Column(
         Integer,
-        default=0
+        default=0,
+    )
+
+
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    session_id = Column(
+        String,
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
+    title = Column(
+        String,
+        nullable=False,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
@@ -63,25 +79,17 @@ class History(Base):
         nullable=False,
     )
 
-    question = Column(Text, nullable=False)
+    question = Column(
+        Text,
+        nullable=False,
+    )
 
-    answer = Column(Text, nullable=False)
+    answer = Column(
+        Text,
+        nullable=False,
+    )
 
     created_at = Column(
         DateTime,
         default=datetime.utcnow,
     )
-
-from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime
-
-
-class Session(Base):
-    __tablename__ = "sessions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(String, unique=True, index=True, nullable=False)
-    title = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-

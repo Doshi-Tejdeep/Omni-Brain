@@ -7,6 +7,28 @@ from pydantic import BaseModel
 
 
 # ==========================
+# DOCUMENT SCHEMAS
+# ==========================
+
+class DocumentBase(BaseModel):
+    filename: str
+    status: str = "uploaded"
+    page_count: int = 0
+
+
+class DocumentCreate(DocumentBase):
+    pass
+
+
+class DocumentResponse(DocumentBase):
+    id: int
+    upload_time: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ==========================
 # HISTORY SCHEMAS
 # ==========================
 
