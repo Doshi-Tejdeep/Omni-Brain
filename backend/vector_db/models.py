@@ -10,6 +10,7 @@ from sqlalchemy import (
     String,
     Text,
     DateTime,
+    ForeignKey,
 )
 
 from .database import Base
@@ -56,6 +57,12 @@ class History(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
+    session_id = Column(
+        String,
+        ForeignKey("sessions.session_id"),
+        nullable=False,
+    )
+
     question = Column(Text, nullable=False)
 
     answer = Column(Text, nullable=False)
@@ -63,7 +70,6 @@ class History(Base):
     created_at = Column(
         DateTime,
         default=datetime.utcnow,
-        index=True
     )
 
 from sqlalchemy import Column, Integer, String, DateTime

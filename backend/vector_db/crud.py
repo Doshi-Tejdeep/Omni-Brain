@@ -146,4 +146,47 @@ def delete_session(db: Session, session_id: str):
     db.delete(session)
     db.commit()
 
-    return session
+    return Session
+
+# ==========================
+# CHAT HISTORY CRUD
+# ==========================
+
+from .models import History
+
+
+# CREATE CHAT MESSAGE
+def create_chat_history(db: DBSession, history: History):
+    db.add(history)
+    db.commit()
+    db.refresh(history)
+    return history
+
+
+# GET CHAT HISTORY FOR A SESSION
+def get_chat_history(db: DBSession, session_id: str):
+    return (
+        db.query(History)
+        .filter(History.session_id == session_id)
+        .order_by(History.created_at.asc())
+        .all()
+    )
+
+
+# DELETE ALL HISTORY OF A SESSION
+def delete_chat_history(db: DBSession, session_id: str):
+    history = (
+        db.query(History)
+        .filter(History.session_id == session_id)
+        .all()
+    )
+
+    if not history:
+        return None
+
+    for message in history:
+        db.delete(message)
+
+    db.commit()
+
+    return True
