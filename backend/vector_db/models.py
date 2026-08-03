@@ -1,10 +1,17 @@
 """
-Database models (Day 7 - History)
+Database models
 """
 
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 
 from .database import Base
 
@@ -38,33 +45,51 @@ class Document(Base):
     )
 
 
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    session_id = Column(
+        String,
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
+    title = Column(
+        String,
+        nullable=False,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+    )
+
+
 class History(Base):
     __tablename__ = "history"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    question = Column(Text, nullable=False)
+    session_id = Column(
+        String,
+        ForeignKey("sessions.session_id"),
+        nullable=False,
+    )
 
-    answer = Column(Text, nullable=False)
+    question = Column(
+        Text,
+        nullable=False,
+    )
+
+    answer = Column(
+        Text,
+        nullable=False,
+    )
 
     created_at = Column(
         DateTime,
         default=datetime.utcnow,
-        index=True
-    )
-
-from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime
-
-
-class Session(Base):
-    __tablename__ = "sessions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(String, unique=True, index=True, nullable=False)
-    title = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-
-        index=True,
     )

@@ -8,7 +8,18 @@ AGENT_DESCRIPTIONS = {
 }
 
 # Keywords used for routing
-SQL_KEYWORDS = {"sql", "table", "database", "query"}
+SQL_KEYWORDS = {
+    "sql",
+    "table",
+    "database",
+    "query",
+    "document",
+    "documents",
+    "session",
+    "sessions",
+    "history",
+    "conversation",
+}
 VISION_KEYWORDS = {"image", "chart", "graph", "plot", "photo"}
 
 
