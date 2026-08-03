@@ -52,8 +52,11 @@ class VectorStore:
             texts.append(chunk["text"])
             embeddings.append(chunk["embedding"])
             metadatas.append(
-                {"page_number": chunk["page_number"], "chunk_id": chunk["chunk_id"]}
-            )
+    {
+        "page_number": str(chunk.get("page") or "unknown"),
+        "chunk_id": str(chunk["chunk_index"])
+    }
+)
 
         # Access the underlying Chroma collection
         self.vector_db._collection.add(
