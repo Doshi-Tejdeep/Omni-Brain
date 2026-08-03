@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from document_processing.index_document import index_document
-from app.utils.logger import logger
-from app.config import (
+from backend.document_processing.index_document import index_document
+from backend.app.utils.logger import logger
+from backend.app.config import (
     MAX_FILE_SIZE,
     ALLOWED_FILE_TYPES,
     UPLOAD_DIR,
@@ -82,8 +82,8 @@ async def upload_file(file: UploadFile = File(...)):
         raise
 
     except Exception as e:
-        logger.error(f"Upload failed: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="Internal Server Error",
-        )
+        logger.exception("Upload failed")
+raise HTTPException(
+    status_code=500,
+    detail="Internal Server Error",
+)
