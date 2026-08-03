@@ -1,16 +1,14 @@
 """
-Pydantic schemas for the Vector Database module.
+Database schemas and metadata definitions.
 """
 
 from datetime import datetime
-
 from pydantic import BaseModel
 
 
-# -------------------------
-# Document Schemas
-# -------------------------
-
+# ==========================
+# DOCUMENT SCHEMAS
+# ==========================
 
 class DocumentBase(BaseModel):
     filename: str
@@ -30,10 +28,9 @@ class DocumentResponse(DocumentBase):
         from_attributes = True
 
 
-# -------------------------
-# History Schemas
-# -------------------------
-
+# ==========================
+# HISTORY SCHEMAS
+# ==========================
 
 class HistoryBase(BaseModel):
     session_id: str
@@ -51,6 +48,7 @@ class HistoryResponse(HistoryBase):
 
     class Config:
         from_attributes = True
+
 
 # ==========================
 # SESSION SCHEMAS

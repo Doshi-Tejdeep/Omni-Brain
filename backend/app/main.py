@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.utils.logger import logger
-from app.routes.health import router as health_router
-from app.routes.upload import router as upload_router
-from app.routes.ask import router as ask_router
-from app.routes.vision import router as vision_router
-from app.routes.final import router as final_router
-from app.config import UPLOAD_DIR
+from backend.app.utils.logger import logger
+from backend.app.routes.health import router as health_router
+from backend.app.routes.upload import router as upload_router
+from backend.app.routes.ask import router as ask_router
+from backend.app.routes.vision import router as vision_router
+from backend.app.routes.final import router as final_router
+from backend.app.config import UPLOAD_DIR
 import os
 
 
