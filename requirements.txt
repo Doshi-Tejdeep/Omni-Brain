@@ -27,3 +27,6 @@ python-dotenv
 
 # HTTP
 requests
+
+# Testing / PDF Fixtures
+reportlab
