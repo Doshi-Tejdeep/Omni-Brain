@@ -51,12 +51,11 @@ def test_invalid_overlap():
 def test_chunk_pages():
     """Test chunking while preserving page metadata."""
     pages = [
-        {
-            "page": 1,
-            "text": "A" * 600,
-        }
-    ]
-
+    {
+        "page_number": 1,
+        "text": "A" * 600,
+    }
+]
     chunks = chunk_pages(
         pages,
         chunk_size=500,
