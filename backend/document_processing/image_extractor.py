@@ -29,23 +29,22 @@ def extract_images_from_pdf(pdf_path: str, output_dir: str) -> list[dict]:
                 image_bytes = image_data["image"]
                 extension = image_data["ext"]
 
-                filename = (
-                    f"page_{page_number}_image_{image_number}.{extension}"
-                )
+                filename = f"page_{page_number}_image_{image_number}.{extension}"
 
                 image_path = output_path / filename
 
                 with open(image_path, "wb") as image_file:
                     image_file.write(image_bytes)
 
-    extracted_images.append(
-    {
-        "page_number": page_number,
-        "image_number": image_number,
-        "filename": filename,
-        "path": str(image_path),
-        "format": extension,
-        "size_bytes": len(image_bytes),
-    }
-)
+                extracted_images.append(
+                    {
+                        "page_number": page_number,
+                        "image_number": image_number,
+                        "filename": filename,
+                        "path": str(image_path),
+                        "format": extension,
+                        "size_bytes": len(image_bytes),
+                    }
+                )
+
     return extracted_images

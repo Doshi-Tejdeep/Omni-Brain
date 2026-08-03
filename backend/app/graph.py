@@ -12,7 +12,7 @@ workflow = StateGraph(AgentState)
 # Add the Supervisor node
 workflow.add_node("supervisor", route_query)
 
-#search agent node
+# search agent node
 workflow.add_node("search_agent", search_agent)
 workflow.add_node("sql_agent", sql_agent)
 workflow.add_node("vision_agent", vision_agent)

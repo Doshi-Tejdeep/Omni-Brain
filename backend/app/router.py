@@ -4,7 +4,7 @@ from state import AgentState
 AGENT_DESCRIPTIONS = {
     "search": "Handles document retrieval and RAG-based question answering.",
     "sql": "Handles database queries and structured data retrieval.",
-    "vision": "Handles image and chart understanding."
+    "vision": "Handles image and chart understanding.",
 }
 
 # Keywords used for routing
@@ -31,6 +31,7 @@ def route_query(state: AgentState) -> AgentState:
         state["route"] = "search"
 
     return state
+
 
 def decide_next_node(state: AgentState) -> str:
     """

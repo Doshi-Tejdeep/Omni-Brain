@@ -7,6 +7,4 @@ def get_embeddings():
     throughout the RAG pipeline.
     """
 
-    return OllamaEmbeddings(
-        model="nomic-embed-text"
-    )
+    return OllamaEmbeddings(model="nomic-embed-text")

@@ -1,5 +1,6 @@
 from state import AgentState
 
+
 def vision_agent(state: AgentState) -> AgentState:
     """
     Vision Agent
