@@ -1,4 +1,6 @@
 import io
+from unittest.mock import MagicMock, patch
+
 from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
 
@@ -31,7 +33,12 @@ def create_test_pdf():
     return buffer.read()
 
 
-def test_upload_to_rag_pipeline():
+@patch("backend.document_processing.index_document.get_embeddings")
+def test_upload_to_rag_pipeline(mock_get_embeddings):
+
+    mock_model = MagicMock()
+    mock_model.embed_query.return_value = [0.0] * 768
+    mock_get_embeddings.return_value = mock_model
 
     pdf_content = create_test_pdf()
 
