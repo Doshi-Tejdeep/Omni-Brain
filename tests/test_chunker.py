@@ -63,10 +63,11 @@ def test_chunk_pages():
     )
 
     assert len(chunks) == 2
-    assert chunks[0]["page"] == 1
+
+    assert chunks[0]["page_number"] == 1
     assert chunks[0]["chunk_index"] == 0
     assert "text" in chunks[0]
 
-    assert chunks[1]["page"] == 1
+    assert chunks[1]["page_number"] == 1
     assert chunks[1]["chunk_index"] == 1
-    assert "text" in chunks[1]
+    assert "text" in chunks[1] 
