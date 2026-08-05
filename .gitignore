@@ -233,3 +233,6 @@ backend/chroma_db/*
 
 # SQLite database
 omnibrain.db
+chroma_db/
+storage/
+sample_data/extracted_images/

@@ -1,7 +1,7 @@
-from vector_db.vector_store import VectorStore
-from app.langchain_config import get_llm
-from app.prompts import SEARCH_PROMPT
-from app.utils.logger import logger
+from backend.vector_db.vector_store import VectorStore
+from backend.app.langchain_config import get_llm
+from backend.app.prompts import SEARCH_PROMPT
+from backend.app.utils.logger import logger
 
 
 async def generate_answer(question: str):
