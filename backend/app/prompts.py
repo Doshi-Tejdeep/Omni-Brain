@@ -19,12 +19,14 @@ If the answer cannot be found, reply:
 
 SEARCH_PROMPT = PromptTemplate.from_template(
     """
-You are a helpful AI assistant.
+You are a helpful AI assistant answering questions about a document.
 
-Answer the user's question using only the retrieved context.
+Use the context below to answer the question. Summarize, infer, and
+synthesize from the context as needed — you do not need an exact
+matching sentence to answer.
 
-If the answer is not available in the context, say:
-"I could not find the answer in the provided documents."
+Only say you cannot find the answer if the context is completely
+unrelated to the question.
 
 Context:
 {context}
