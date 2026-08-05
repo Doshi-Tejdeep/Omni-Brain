@@ -1,147 +1,373 @@
- #Title Of the Project
-"OmniBrain": Agentic Multi-Modal RAG Orchestrator
-# Omni-Brain Description
-OmniBrain is an AI-powered assistant that integrates multiple AI models to provide intelligent conversations, task automation, code generation, document analysis, and productivity tools through a user-friendly interface.
-Omni Brain is an AI-powered knowledge management and question-answering platform that enables users to upload documents and interact with them using natural language. Instead of manually searching through files, users can ask questions in plain English, and the system retrieves the most relevant information from the uploaded documents using Retrieval-Augmented Generation (RAG) and Large Language Models (LLMs).
+# OmniBrain: Agentic Multi-Modal RAG Orchestrator
 
-The project combines document processing, semantic search, vector databases, and generative AI to create an intelligent assistant capable of understanding document content and providing context-aware responses.
-# Features of Omni-Brain
+## Overview
 
-- Upload PDF documents
-- Intelligent document parsing
-- AI-powered question answering
-- Chat interface
+OmniBrain is an AI-powered Agentic Multi-Modal Retrieval-Augmented Generation (RAG) system that enables users to upload documents and interact with them using natural language.
+
+Instead of manually searching through documents, users can ask questions in plain English. OmniBrain processes documents, retrieves relevant information using semantic search, and generates context-aware answers using Large Language Models.
+
+The project combines:
+
+- Document Processing
+- Embeddings
+- Vector Search
+- Retrieval-Augmented Generation (RAG)
+- Agentic AI workflows
+- LLM-based Question Answering
+
+---
+
+# Key Features
+
+## Document Processing
+
+- PDF document upload
+- Text extraction using PyMuPDF
+- Intelligent text chunking
+- Metadata extraction
+- OCR support
+- Page-level source tracking
+
+## AI & RAG Pipeline
+
+- Semantic embedding generation
+- ChromaDB vector storage
+- Similarity-based retrieval
+- Context-aware answer generation
+- Ollama LLM integration
+- Source citation support
+
+## Application Features
+
 - FastAPI backend
 - Streamlit frontend
-- Database storage
-- Docker support
-- # Tech stacks used to create a Omni Brain
-- Frontend
+- REST API support
+- Docker deployment support
+- Automated testing with Pytest
+
+---
+
+# System Architecture
+
+```
+                User
+                  |
+                  |
+            Upload PDF
+                  |
+                  ↓
+          FastAPI Upload API
+                  |
+                  ↓
+       Document Processing Pipeline
+                  |
+        -------------------------
+        |           |           |
+   Extraction   Chunking   Metadata
+        |
+        ↓
+  Embedding Generation
+        |
+        ↓
+      ChromaDB
+   Vector Database
+        |
+        ↓
+      Retriever
+        |
+        ↓
+     Ollama LLM
+        |
+        ↓
+   Answer + Sources
+```
+
+---
+
+# Tech Stack
+
+## Frontend
+
 - Streamlit
 
-Backend
+## Backend
+
+- Python
 - FastAPI
 
-AI
+## AI / RAG
+
 - LangChain
-- OpenAI/Ollama
+- Ollama
+- Embedding Models
 
-Database
-- SQLite / PostgreSQL
+## Vector Database
 
-DevOps
+- ChromaDB
+
+## Document Processing
+
+- PyMuPDF
+- Tesseract OCR
+
+## DevOps
+
 - Docker
 - Docker Compose
 - GitHub Actions
-- Pre-commit
+- Pytest
 
-#Folder Structure of the Omni Brain Project
-- Omni-Brain/
--
--├── backend/
+---
 
--├── frontend/
+# Project Structure
 
--├── docs/
+```
+Omni-Brain/
+│
+├── backend/
+│   ├── app/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── main.py
+│   │
+│   ├── document_processing/
+│   │   ├── pdf_parser.py
+│   │   ├── chunker.py
+│   │   ├── metadata_extractor.py
+│   │   ├── image_extractor.py
+│   │   └── ocr_extractor.py
+│   │
+│   └── vector_db/
+│       ├── embeddings.py
+│       └── vector_store.py
+│
+├── frontend/
+│
+├── tests/
+│
+├── docs/
+│
+├── sample_data/
+│
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+```
 
--├── tests/
+---
 
--├── sample_data/
+# Installation
 
--├── Dockerfile
+## Clone Repository
 
--├── docker-compose.yml
-
--├── README.md
-
--└── requirements.txt
-
-# Progress of Installation
+```bash
 git clone <repository-url>
 
 cd Omni-Brain
+```
 
-python -m venv venv
+## Create Virtual Environment
 
+```bash
+python -m venv .venv
+
+source .venv/bin/activate
+```
+
+## Install Dependencies
+
+```bash
 pip install -r requirements.txt
-# To run the Backend of the project Omni Brain project
-cd backend
+```
 
-uvicorn app.main:app --reload
-# To run the Frontend of the project Omni Brain project
-streamlit run frontend/app.py
-# To run the Docker of the project Omni Brain project
-docker compose up --build
-# Omni Brain Project creators Team Members
-| Member     | Role                |
-| ---------- | ------------------- |
-| D. Tejdeep | Team Lead           |
-| Saumaditya | Backend             |
-| Pavan      | Frontend            |
-| Rishi      | Document Processing |
-| Mariam     | AI/RAG              |
-| Teja       | Database            |
-| Sunishka   | DevOps/QA           |
-# Development Workflow
-Requirement Analysis
+---
 
-        ↓
+# Running the Application
 
-System Design
+## Start Backend
 
-        ↓
+From the project root:
 
-Development
+```bash
+uvicorn backend.app.main:app --reload
+```
 
-        ↓
+Backend URL:
 
-Integration
+```
+http://127.0.0.1:8000
+```
 
-        ↓
+API Documentation:
 
-Testing
+```
+http://127.0.0.1:8000/docs
+```
 
-        ↓
+---
 
-Deployment
+# API Endpoints
 
-        ↓
+## Upload Document
 
-Monitoring & Maintenance
+### Endpoint
+
+```
+POST /upload
+```
+
+Workflow:
+
+```
+PDF Upload
+     |
+     ↓
+Text Extraction
+     |
+     ↓
+Chunk Creation
+     |
+     ↓
+Embedding Generation
+     |
+     ↓
+ChromaDB Storage
+```
+
+---
+
+## Ask Questions
+
+### Endpoint
+
+```
+POST /ask
+```
+
+Example Request:
+
+```json
+{
+  "question": "What is OmniBrain?"
+}
+```
+
+Example Response:
+
+```json
+{
+  "question": "What is OmniBrain?",
+  "answer": {
+    "answer": "OmniBrain is an Agentic Multi Modal RAG Orchestrator.",
+    "sources": [
+      "Page 1"
+    ]
+  }
+}
+```
+
+---
+
 # Testing
-pytest
 
-# Docker
+Run all tests:
 
-## Prerequisites
+```bash
+python -m pytest -v
+```
 
-- Docker Desktop (Windows/macOS) or Docker Engine (Linux)
-- Docker Compose
+Current test status:
 
-## Build the Docker Image
+```
+14 tests passed
+```
+
+The test suite validates:
+
+- PDF parsing
+- Text chunking
+- Metadata extraction
+- OCR extraction
+- Image extraction
+- Table extraction
+- End-to-end RAG pipeline
+
+---
+
+# Docker Setup
+
+## Build Image
 
 ```bash
 docker build -t omnibrain .
 ```
 
-## Run the Test Container
+## Run Using Docker Compose
 
 ```bash
-docker run --rm omnibrain
+docker compose up --build
 ```
 
-## Run with Docker Compose
+---
 
-```bash
-docker compose up
+# Team Members
+
+| Member | Role |
+|---|---|
+| D. Tejdeep | Team Lead |
+| Saumaditya | Backend |
+| Pavan | Frontend |
+| Rishi | Document Processing |
+| Mariam | AI/RAG |
+| Teja | Database |
+| Sunishka | DevOps/QA |
+
+---
+
+# Development Workflow
+
+```
+Requirement Analysis
+          ↓
+System Design
+          ↓
+Development
+          ↓
+Integration
+          ↓
+Testing
+          ↓
+Deployment
+          ↓
+Monitoring
 ```
 
-## Notes
+---
 
-- Run all commands from the project root directory.
-- The current Docker configuration is intended for testing and development.
-- Docker Compose uses the `qa` service defined in `docker-compose.yml`.
+# Completed Milestones
 
-## Additional Documentation
+✅ Document Processing Pipeline  
+✅ PDF Text Extraction  
+✅ Intelligent Chunking  
+✅ Metadata Handling  
+✅ OCR Support  
+✅ Embedding Generation  
+✅ ChromaDB Vector Storage  
+✅ RAG Retrieval Pipeline  
+✅ Ollama LLM Integration  
+✅ Source Citations  
+✅ End-to-End Integration Testing  
 
-- `docs/development-setup.md` – Local development environment setup.
+---
+
+# Release Status
+
+## OmniBrain v1.0
+
+Status:
+
+```
+Production Ready MVP
+```
+

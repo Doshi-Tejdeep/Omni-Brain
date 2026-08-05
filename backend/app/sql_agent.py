@@ -1,4 +1,9 @@
-from state import AgentState
+"""
+SQL Agent
+"""
+
+from backend.app.state import AgentState
+from backend.app.services.sql_service import process_sql_query
 
 
 def sql_agent(state: AgentState) -> AgentState:
@@ -10,6 +15,8 @@ def sql_agent(state: AgentState) -> AgentState:
 
     print("SQL Agent Executed")
 
-    state["response"] = "SQL Agent processed the query."
+    state["response"] = process_sql_query(
+        state["query"]
+    )
 
     return state

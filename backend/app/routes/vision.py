@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.utils.logger import logger
-from app.config import UPLOAD_DIR
+from backend.app.utils.logger import logger
+from backend.app.config import UPLOAD_DIR
 import os
 import shutil
 
