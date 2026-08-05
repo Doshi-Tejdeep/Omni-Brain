@@ -240,3 +240,6 @@ backend/storage/uploads/*
 
 # Ignore extracted images
 sample_data/extracted_images/
+chroma_db/
+storage/
+sample_data/extracted_images/

@@ -43,7 +43,11 @@ def chunk_pages(
             chunked_pages.append(
                 {
                     "page_number": page.get("page_number"),
+<<<<<<< HEAD
                     "chunk_id": index,
+=======
+                    "chunk_index": index,
+>>>>>>> feature/document-processing
                     "text": chunk,
                 }
             )

@@ -42,6 +42,8 @@ def extract_images_from_pdf(pdf_path: str, output_dir: str) -> list[dict]:
                         "image_number": image_number,
                         "filename": filename,
                         "path": str(image_path),
+                        "format": extension,
+                        "size_bytes": len(image_bytes),
                     }
                 )
 
