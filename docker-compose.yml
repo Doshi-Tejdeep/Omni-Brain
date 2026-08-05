@@ -1,4 +1,50 @@
 services:
+  backend:
+    build:
+      context: .
+    image: omnibrain:latest
+    container_name: omnibrain-backend
+    working_dir: /app/backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  frontend:
+    image: omnibrain:latest
+    container_name: omnibrain-frontend
+    working_dir: /app
+    command: streamlit run frontend/app.py --server.address=0.0.0.0 --server.port=8501
+    volumes:
+      - .:/app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   qa:
-    build: .
+    image: omnibrain:latest
+    container_name: omnibrain-qa
+    working_dir: /app
     command: pytest
+    volumes:
+      - .:/app
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: omnibrain-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama-data:

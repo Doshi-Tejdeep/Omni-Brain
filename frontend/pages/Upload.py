@@ -21,7 +21,7 @@ st.set_page_config(
 # Configuration
 # -------------------------------------------------------------------
 
-API_BASE_URL = "http://127.0.0.1:8000"
+API_BASE_URL = "http://backend:8000"
 UPLOAD_URL = f"{API_BASE_URL}/upload"
 
 MAX_FILE_MB = 50
@@ -41,7 +41,7 @@ defaults = {
     "last_uploaded_file_id": None,
     # Day 5 additions — loading state tracking
     "is_uploading": False,
-    "upload_stage": None,          # "connecting" | "uploading" | "processing" | "done" | "error"
+    "upload_stage": None,  # "connecting" | "uploading" | "processing" | "done" | "error"
     "upload_error": None,
     "pending_file_bytes": None,
     "pending_file_name": None,
@@ -56,6 +56,7 @@ for key, value in defaults.items():
 # -------------------------------------------------------------------
 # Backend and validation helpers
 # -------------------------------------------------------------------
+
 
 @st.cache_data(ttl=10, show_spinner=False)
 def is_backend_online() -> bool:
@@ -450,7 +451,7 @@ delays = [0, 3, 6, 2, 9, 1, 5, 8]
 for size, left, duration, delay in zip(sizes, lefts, durations, delays):
     particles_html += (
         f'<div class="particle" style="width:{size}px; height:{size}px; '
-        f'left:{left}%; animation-duration:{duration}s; '
+        f"left:{left}%; animation-duration:{duration}s; "
         f'animation-delay:{delay}s;"></div>'
     )
 
@@ -484,7 +485,9 @@ def render_stage_track(current_stage: str, failed: bool = False):
         else:
             css_class = ""
         chips.append(f'<div class="stage-chip {css_class}">{STAGE_LABELS[stage]}</div>')
-    st.markdown(f'<div class="stage-track">{"".join(chips)}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="stage-track">{"".join(chips)}</div>', unsafe_allow_html=True
+    )
 
 
 # -------------------------------------------------------------------
@@ -593,7 +596,7 @@ file = st.file_uploader(
     type=["pdf"],
     label_visibility="collapsed",
     help=f"PDF files up to {MAX_FILE_MB} MB are supported.",
-    disabled=st.session_state.is_uploading,   # Day 5: lock the widget mid-upload
+    disabled=st.session_state.is_uploading,  # Day 5: lock the widget mid-upload
 )
 
 st.caption(f"PDF only - Maximum file size: {MAX_FILE_MB} MB")
@@ -799,7 +802,9 @@ if st.session_state.is_uploading and st.session_state.pending_file_bytes is not 
             except ValueError:
                 error_detail = response.text
 
-            st.session_state.upload_error = f"Upload failed ({response.status_code}): {error_detail}"
+            st.session_state.upload_error = (
+                f"Upload failed ({response.status_code}): {error_detail}"
+            )
             with stage_box.container():
                 render_stage_track(st.session_state.upload_stage, failed=True)
             with status_box.container():
@@ -811,21 +816,29 @@ if st.session_state.is_uploading and st.session_state.pending_file_bytes is not 
             "at http://127.0.0.1:8000."
         )
         with stage_box.container():
-            render_stage_track(st.session_state.upload_stage or "connecting", failed=True)
+            render_stage_track(
+                st.session_state.upload_stage or "connecting", failed=True
+            )
         with status_box.container():
             st.error(st.session_state.upload_error)
 
     except requests.Timeout:
-        st.session_state.upload_error = "The upload request timed out. Please try again."
+        st.session_state.upload_error = (
+            "The upload request timed out. Please try again."
+        )
         with stage_box.container():
-            render_stage_track(st.session_state.upload_stage or "uploading", failed=True)
+            render_stage_track(
+                st.session_state.upload_stage or "uploading", failed=True
+            )
         with status_box.container():
             st.error(st.session_state.upload_error)
 
     except requests.RequestException as error:
         st.session_state.upload_error = f"Upload error: {error}"
         with stage_box.container():
-            render_stage_track(st.session_state.upload_stage or "uploading", failed=True)
+            render_stage_track(
+                st.session_state.upload_stage or "uploading", failed=True
+            )
         with status_box.container():
             st.error(st.session_state.upload_error)
 
@@ -865,4 +878,3 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-

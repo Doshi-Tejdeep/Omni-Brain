@@ -12,7 +12,7 @@ import requests
 # ──────────────────────────────────────────────────────────────────────────
 # BACKEND CONFIG
 # ──────────────────────────────────────────────────────────────────────────
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "http://backend:8000"
 
 # ──────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -32,7 +32,7 @@ defaults = {
     "questions_asked": 0,
     "workspace_status": "Waiting for upload",
     "uploaded_file": None,
-    "uploaded_files": [],     # list of {"name": ..., "status": "Ready"} for the sidebar doc list
+    "uploaded_files": [],  # list of {"name": ..., "status": "Ready"} for the sidebar doc list
     "page": "Home",
     "chat_history": [],
 }
@@ -411,14 +411,14 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 # floating particle field (purely decorative, positions/timings varied inline)
 particles_html = '<div class="particle-field">'
-sizes  = [18, 26, 14, 32, 20, 24, 16, 28]
-lefts  = [5, 15, 27, 40, 55, 68, 80, 92]
-durs   = [14, 18, 22, 16, 20, 24, 15, 19]
+sizes = [18, 26, 14, 32, 20, 24, 16, 28]
+lefts = [5, 15, 27, 40, 55, 68, 80, 92]
+durs = [14, 18, 22, 16, 20, 24, 15, 19]
 delays = [0, 3, 6, 2, 9, 1, 5, 8]
-for s, l, d, dl in zip(sizes, lefts, durs, delays):
+for s, left, d, dl in zip(sizes, lefts, durs, delays):
     particles_html += (
         f'<div class="particle" style="width:{s}px;height:{s}px;'
-        f'left:{l}%;animation-duration:{d}s;animation-delay:{dl}s;"></div>'
+        f'left:{left}%;animation-duration:{d}s;animation-delay:{dl}s;"></div>'
     )
 particles_html += "</div>"
 st.markdown(particles_html, unsafe_allow_html=True)
@@ -433,7 +433,11 @@ with st.sidebar:
 
     # ---- Navigation ----
     nav_options = ["Home", "Chat", "Upload"]
-    current_idx = nav_options.index(st.session_state.page) if st.session_state.page in nav_options else 0
+    current_idx = (
+        nav_options.index(st.session_state.page)
+        if st.session_state.page in nav_options
+        else 0
+    )
     st.session_state.page = st.radio(
         "Navigate", nav_options, index=current_idx, label_visibility="collapsed"
     )
@@ -588,9 +592,21 @@ if st.session_state.page == "Home":
     st.markdown("## How it works")
     s1, s2, s3 = st.columns(3)
     steps = [
-        ("01", "Upload", "Drop in a PDF and let OmniBrain validate its structure and content."),
-        ("02", "Prepare", "The document is chunked, indexed, and readied for AI-powered retrieval."),
-        ("03", "Ask", "Chat naturally with your document and get grounded, cited answers."),
+        (
+            "01",
+            "Upload",
+            "Drop in a PDF and let OmniBrain validate its structure and content.",
+        ),
+        (
+            "02",
+            "Prepare",
+            "The document is chunked, indexed, and readied for AI-powered retrieval.",
+        ),
+        (
+            "03",
+            "Ask",
+            "Chat naturally with your document and get grounded, cited answers.",
+        ),
     ]
     for col, (num, title, desc) in zip([s1, s2, s3], steps):
         with col:
@@ -610,13 +626,19 @@ if st.session_state.page == "Home":
 # ──────────────────────────────────────────────────────────────────────────
 elif st.session_state.page == "Upload":
     st.markdown("## 📤 Upload Center")
-    st.caption("Add a PDF and validate it before preparing it for OmniBrain processing.")
+    st.caption(
+        "Add a PDF and validate it before preparing it for OmniBrain processing."
+    )
 
     file = st.file_uploader("Drag & drop a PDF, or click to browse", type=["pdf"])
 
     if file is not None:
         progress = st.progress(0, text="Validating document...")
-        for pct, label in [(30, "Validating document..."), (65, "Indexing content..."), (100, "Finalizing...")]:
+        for pct, label in [
+            (30, "Validating document..."),
+            (65, "Indexing content..."),
+            (100, "Finalizing..."),
+        ]:
             time.sleep(0.4)
             progress.progress(pct, text=label)
 
@@ -626,7 +648,9 @@ elif st.session_state.page == "Upload":
 
         # keep the sidebar document list in sync, no duplicates on rerun
         if not any(d["name"] == file.name for d in st.session_state.uploaded_files):
-            st.session_state.uploaded_files.append({"name": file.name, "status": "Ready"})
+            st.session_state.uploaded_files.append(
+                {"name": file.name, "status": "Ready"}
+            )
 
         st.success(f"✅ '{file.name}' is prepared and ready for chat.")
         st.balloons()
