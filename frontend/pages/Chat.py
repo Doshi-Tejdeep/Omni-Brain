@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "http://backend:8000"
 
 # ──────────────────────────────────────────────────────────────────────────
 # SESSION STATE
@@ -142,7 +142,10 @@ else:
         with st.chat_message("user"):
             st.write(turn["question"])
         with st.chat_message("assistant"):
-            st.markdown(f'<div class="answer-card">{turn["answer"]}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="answer-card">{turn["answer"]}</div>',
+                unsafe_allow_html=True,
+            )
             if turn.get("sources"):
                 with st.expander(f"📚 Sources ({len(turn['sources'])})"):
                     for src in turn["sources"]:
@@ -175,7 +178,9 @@ else:
                     answer = "⚠️ The request timed out. Please try again."
                     sources = []
 
-            st.markdown(f'<div class="answer-card">{answer}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="answer-card">{answer}</div>', unsafe_allow_html=True
+            )
             if sources:
                 with st.expander(f"📚 Sources ({len(sources)})"):
                     for src in sources:
