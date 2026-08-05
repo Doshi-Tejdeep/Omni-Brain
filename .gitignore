@@ -233,3 +233,10 @@ backend/chroma_db/*
 
 # SQLite database
 omnibrain.db
+
+# Ignore uploaded files but keep the folder
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+
+# Ignore extracted images
+sample_data/extracted_images/
