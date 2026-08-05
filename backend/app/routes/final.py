@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from backend.app.utils.logger import logger
-from backend.app.services.rag_service import generate_answer
+from app.utils.logger import logger
+from app.services.rag_service import generate_answer
 import os
 import shutil
 router = APIRouter()

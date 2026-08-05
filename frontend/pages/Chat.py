@@ -14,9 +14,9 @@ st.set_page_config(
 
 BACKEND_URL = "http://127.0.0.1:8000"
 
-# ──────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------
 # SESSION STATE
-# ──────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------
 defaults = {
     "uploaded_file": None,
     "chat_history": [],
@@ -25,163 +25,135 @@ defaults = {
 for key, val in defaults.items():
     st.session_state.setdefault(key, val)
 
-# ──────────────────────────────────────────────────────────────────────────
-# THEME (same palette as app.py — keep in sync if you change one)
-# ──────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------
+# THEME
+# ---------------------------------------------------------
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-:root {
-    --bg-deep:      #0b0f19;
-    --bg-panel:     #121729;
-    --bg-card:      #161c30;
-    --accent-1:     #7c3aed;
-    --accent-2:     #ec4899;
-    --accent-3:     #06b6d4;
-    --text-main:    #eef1f8;
-    --text-muted:   #9aa3b8;
-    --border-soft:  rgba(255,255,255,0.08);
-}
-
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-
-header[data-testid="stHeader"],
-div[data-testid="stToolbar"],
-div[data-testid="stDecoration"],
-div[data-testid="stStatusWidget"] {
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-html, body, .stApp, [data-testid="stAppViewContainer"] {
-    background: linear-gradient(-45deg, #0b0f19, #121729, #1a1035, #0b0f19) !important;
-    background-size: 400% 400% !important;
-    animation: gradientShift 18s ease infinite;
-    color: var(--text-main);
-}
-@keyframes gradientShift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.block-container { animation: fadeInUp 0.6s ease-out; }
-
-section[data-testid="stSidebar"] {
-    background: var(--bg-panel) !important;
-    border-right: 1px solid var(--border-soft);
-}
-section[data-testid="stSidebar"] * { color: var(--text-main); }
-
-h1, h2, h3 {
-    font-family: 'Sora', sans-serif !important;
-    font-weight: 800 !important;
-}
-
-.answer-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    border-left: 3px solid var(--accent-3);
-    border-radius: 12px;
-    padding: 16px 18px;
-    line-height: 1.55;
-    animation: fadeInUp 0.4s ease-out;
-}
-
-div.stButton > button {
-    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 0.6em 1.4em;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-div.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(124,58,237,0.4);
-}
-
-hr { border-color: var(--border-soft) !important; }
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
+    .stApp {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        color: #f0f0f0;
+    }
+    .stTextInput > div > div > input {
+        background-color: #1e1b3a;
+        color: #ffffff;
+        border: 1px solid #7b2ff7;
+        border-radius: 8px;
+    }
+    .stButton > button {
+        background: linear-gradient(90deg, #7b2ff7, #f107a3);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+    .stButton > button:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 12px rgba(241, 7, 163, 0.6);
+    }
+    [data-testid="stChatMessage"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-# ──────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------
 # SIDEBAR
-# ──────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------
 with st.sidebar:
     st.markdown("### 🧠 OmniBrain")
     st.caption("AI Document Intelligence")
     st.markdown("---")
-    if st.session_state.uploaded_file is None:
-        st.info("Upload a document to begin", icon="ℹ️")
+
+    if st.session_state.uploaded_file:
+        st.success(f"Loaded: {st.session_state.uploaded_file}")
     else:
-        st.success(f"Loaded: {st.session_state.uploaded_file}", icon="✅")
+        st.info("No document loaded. Go to Upload first.")
 
-# ──────────────────────────────────────────────────────────────────────────
-# MAIN — CHAT
-# ──────────────────────────────────────────────────────────────────────────
-st.markdown("## 💬 Ask OmniBrain")
+# ---------------------------------------------------------
+# HEADER
+# ---------------------------------------------------------
+st.title("💬 Ask OmniBrain")
 
-if st.session_state.uploaded_file is None:
-    st.warning("Upload a document first to unlock chat.")
-    st.page_link("pages/Upload.py", label="Go to Upload Center →")
-else:
+if st.session_state.uploaded_file:
     st.caption(f"Chatting with: **{st.session_state.uploaded_file}**")
+else:
+    st.caption("No document loaded yet — answers won't be grounded in your file.")
 
-    # replay previous turns
-    for turn in st.session_state.chat_history:
+st.markdown("---")
+
+# ---------------------------------------------------------
+# ASK / ANSWER SECTION
+# ---------------------------------------------------------
+st.subheader("Ask OmniBrain")
+
+col1, col2 = st.columns([5, 1])
+with col1:
+    user_question = st.text_input(
+        "Your question",
+        placeholder="e.g. Summarize the key findings in this document",
+        label_visibility="collapsed",
+    )
+with col2:
+    ask_clicked = st.button("Ask", use_container_width=True)
+
+if ask_clicked:
+    if not user_question.strip():
+        st.warning("Please type a question before asking.")
+    else:
+        with st.spinner("Thinking... this can take a minute on first run."):
+            try:
+                response = requests.post(
+                    f"{BACKEND_URL}/ask",
+                    json={"question": user_question},
+                    timeout=180,
+                )
+                response.raise_for_status()
+                data = response.json()
+                answer = data.get("answer", "No answer returned.")
+
+                st.session_state.chat_history.append(
+                    {"question": user_question, "answer": answer}
+                )
+                st.session_state.questions_asked += 1
+
+            except requests.exceptions.ConnectionError:
+                st.error(
+                    "Could not connect to the backend at "
+                    f"{BACKEND_URL}. Make sure uvicorn is running."
+                )
+            except requests.exceptions.Timeout:
+                st.error(
+                    "The backend took too long to respond (over 3 minutes). "
+                    "The AI model may be running slowly. Try again."
+                )
+            except requests.exceptions.RequestException as e:
+                st.error(f"Request failed: {e}")
+
+# ---------------------------------------------------------
+# DISPLAY CONVERSATION
+# ---------------------------------------------------------
+if st.session_state.chat_history:
+    st.markdown("---")
+    st.subheader("Conversation")
+    st.caption(f"{st.session_state.questions_asked} question(s) asked this session")
+
+    for entry in reversed(st.session_state.chat_history):
         with st.chat_message("user"):
-            st.write(turn["question"])
+            st.write(entry["question"])
         with st.chat_message("assistant"):
-            st.markdown(f'<div class="answer-card">{turn["answer"]}</div>', unsafe_allow_html=True)
-            if turn.get("sources"):
-                with st.expander(f"📚 Sources ({len(turn['sources'])})"):
-                    for src in turn["sources"]:
-                        st.markdown(f"- {src}")
+            st.write(entry["answer"])
 
-    query = st.chat_input("Ask a question about your document...")
-    if query:
-        with st.chat_message("user"):
-            st.write(query)
-
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                try:
-                    resp = requests.post(
-                        f"{BACKEND_URL}/ask",
-                        json={"question": query},
-                        timeout=30,
-                    )
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        answer = data.get("answer", "No answer returned.")
-                        sources = data.get("sources", [])
-                    else:
-                        answer = f"⚠️ Backend returned an error ({resp.status_code}). Please try again."
-                        sources = []
-                except requests.exceptions.ConnectionError:
-                    answer = "⚠️ Can't reach the backend. Start FastAPI at http://127.0.0.1:8000."
-                    sources = []
-                except requests.exceptions.Timeout:
-                    answer = "⚠️ The request timed out. Please try again."
-                    sources = []
-
-            st.markdown(f'<div class="answer-card">{answer}</div>', unsafe_allow_html=True)
-            if sources:
-                with st.expander(f"📚 Sources ({len(sources)})"):
-                    for src in sources:
-                        st.markdown(f"- {src}")
-
-        st.session_state.questions_asked += 1
-        st.session_state.chat_history.append(
-            {"question": query, "answer": answer, "sources": sources}
-        )
+    if st.button("Clear conversation"):
+        st.session_state.chat_history = []
+        st.session_state.questions_asked = 0
+        st.rerun()
+else:
+    st.markdown("---")
+    st.caption("Your conversation will appear here once you ask a question.")
