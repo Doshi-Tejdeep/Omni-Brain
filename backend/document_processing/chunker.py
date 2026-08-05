@@ -1,4 +1,8 @@
-"""Text chunking utilities for OmniBrain."""
+"""Text chunking utilities for OmniBrain.
+
+Provides helper functions to split extracted PDF text into
+overlapping chunks while preserving page metadata.
+"""
 
 from typing import List, Dict
 
