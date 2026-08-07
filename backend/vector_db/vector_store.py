@@ -32,6 +32,8 @@ class VectorStore:
             persist_directory=CHROMA_DB_PATH,
         )
 
+        print(self.vector_db._collection.count())
+
         self.connected = True
 
     def add_document(self, document):
@@ -76,14 +78,18 @@ class VectorStore:
         if not self.connected:
             self.connect()
 
-        results = self.vector_db.similarity_search(
-            query=query.strip(),
-            k=k,
-        )
+        results = self.vector_db.similarity_search_with_score(
+        query=query.strip(),
+        k=k,
+         )
 
         chunks = []
 
-        for doc in results:
+        for doc, score in results:
+            print(f"\nPage: {doc.metadata['page_number']}")
+            print(f"Chunk: {doc.metadata['chunk_id']}")
+            print(f"Score: {score}")
+
             chunks.append(
                 {
                     "text": doc.page_content,
