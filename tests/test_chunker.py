@@ -14,7 +14,7 @@ def test_chunk_text_empty():
 def test_chunk_text_single_chunk():
     """Test chunking when text fits in one chunk."""
     text = "Hello OmniBrain!"
-    chunks = chunk_text(text, chunk_size=100)
+    chunks = chunk_text(text, chunk_size=100, overlap=20)
 
     assert len(chunks) == 1
     assert chunks[0] == text

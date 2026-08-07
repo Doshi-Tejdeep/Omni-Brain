@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from app.utils.logger import logger
-from app.services.rag_service import generate_answer
+
+from backend.app.services.rag_service import generate_answer
+from backend.app.utils.logger import logger
 
 router = APIRouter()
 
@@ -10,7 +11,7 @@ class QuestionRequest(BaseModel):
     question: str = Field(
         ...,
         description="Question asked by the user",
-        example="What is OmniBrain?"
+        example="What is OmniBrain?",
     )
 
 
@@ -21,29 +22,24 @@ class QuestionRequest(BaseModel):
     responses={
         200: {"description": "Answer generated successfully"},
         400: {"description": "Invalid question"},
-        500: {"description": "Internal Server Error"}
-    }
+        500: {"description": "Internal Server Error"},
+    },
 )
 async def ask_question(request: QuestionRequest):
     try:
-
-        # Validate question
         if not request.question.strip():
             raise HTTPException(
                 status_code=400,
-                detail="Question cannot be empty."
+                detail="Question cannot be empty.",
             )
 
-        # Log incoming request
         logger.info(f"Question received: {request.question}")
 
-        # Generate answer using RAG service
         answer = await generate_answer(request.question)
 
-        # Return response
         return {
             "question": request.question,
-            "answer": answer
+            "answer": answer,
         }
 
     except HTTPException:
@@ -51,8 +47,7 @@ async def ask_question(request: QuestionRequest):
 
     except Exception:
         logger.exception("Ask API failed")
-
         raise HTTPException(
             status_code=500,
-            detail="Internal Server Error"
+            detail="Internal Server Error",
         )
