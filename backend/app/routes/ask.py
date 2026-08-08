@@ -38,7 +38,8 @@ async def ask_question(request: QuestionRequest):
 
         return {
             "question": request.question,
-            "answer": answer,
+            "answer": answer["answer"],
+            "sources": answer["sources"],
         }
 
     except HTTPException:

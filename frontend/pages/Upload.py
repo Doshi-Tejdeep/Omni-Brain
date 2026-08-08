@@ -21,7 +21,7 @@ st.set_page_config(
 # Configuration
 # -------------------------------------------------------------------
 
-API_BASE_URL = "http://backend:8000"
+API_BASE_URL = "http://127.0.0.1:8000"
 UPLOAD_URL = f"{API_BASE_URL}/upload"
 
 MAX_FILE_MB = 50

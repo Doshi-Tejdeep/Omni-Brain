@@ -92,9 +92,10 @@ def test_upload_to_rag_pipeline(
 
     assert "question" in data
     assert "answer" in data
+    assert "sources" in data
 
-    assert "answer" in data["answer"]
-    assert "sources" in data["answer"]
+    assert data["answer"] == "OmniBrain is an Agentic Multi Modal RAG Orchestrator."
+    assert "Page 1" in data["sources"]
 
-    assert len(data["answer"]["answer"]) > 0
-    assert len(data["answer"]["sources"]) > 0
+    assert len(data["answer"]) > 0
+    
