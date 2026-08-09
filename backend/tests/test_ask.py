@@ -1,4 +1,6 @@
 from fastapi.testclient import TestClient
+from unittest.mock import patch
+
 from backend.app.main import app
 
 client = TestClient(app)
@@ -10,8 +12,18 @@ def test_empty_question():
     assert response.status_code == 400
 
 
-def test_valid_question():
-    response = client.post("/ask", json={"question": "What is OmniBrain?"})
+@patch("backend.app.routes.ask.generate_answer")
+def test_valid_question(mock_generate_answer):
+    mock_generate_answer.return_value = {
+        "question": "What is OmniBrain?",
+        "answer": "OmniBrain is an AI-powered document intelligence system.",
+        "sources": [],
+    }   
+
+    response = client.post(
+        "/ask",
+        json={"question": "What is OmniBrain?"},
+    )
 
     assert response.status_code == 200
 
