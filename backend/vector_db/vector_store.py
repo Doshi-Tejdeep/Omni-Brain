@@ -54,11 +54,11 @@ class VectorStore:
             texts.append(chunk["text"])
             embeddings.append(chunk["embedding"])
             metadatas.append(
-    {
-        "page_number": str(chunk.get("page_number") or "unknown"),
-        "chunk_id": str(chunk["chunk_id"])
-    }
-)
+                {
+                    "page_number": str(chunk.get("page_number") or "unknown"),
+                    "chunk_id": str(chunk["chunk_id"]),
+                }
+            )
 
         # Access the underlying Chroma collection
         self.vector_db._collection.add(
@@ -79,9 +79,9 @@ class VectorStore:
             self.connect()
 
         results = self.vector_db.similarity_search_with_score(
-        query=query.strip(),
-        k=k,
-         )
+            query=query.strip(),
+            k=k,
+        )
 
         chunks = []
 

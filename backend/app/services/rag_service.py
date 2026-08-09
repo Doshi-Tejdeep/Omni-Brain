@@ -39,7 +39,6 @@ async def generate_answer(question: str):
             print(f"Chunk: {chunk['chunk_id']}")
             print("-" * 40)
 
-
         if not chunks:
             print("No chunks found.")
             return {
@@ -90,19 +89,13 @@ async def generate_answer(question: str):
         print("\n========== Raw Response ==========")
         print(response)
 
-        answer = (
-            response.content
-            if hasattr(response, "content")
-            else str(response)
-        )
+        answer = response.content if hasattr(response, "content") else str(response)
 
         # -------------------------------
         # Sources
         # -------------------------------
         sources = list(
-            dict.fromkeys(
-                [f"Page {chunk['page_number']}" for chunk in chunks]
-            )
+            dict.fromkeys([f"Page {chunk['page_number']}" for chunk in chunks])
         )
 
         print("\nSources:", sources)

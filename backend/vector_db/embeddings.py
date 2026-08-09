@@ -1,4 +1,5 @@
 """Embeddings done using Ollama"""
+
 from langchain_ollama import OllamaEmbeddings
 
 

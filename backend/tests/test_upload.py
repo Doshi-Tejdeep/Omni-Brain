@@ -1,19 +1,14 @@
+import fitz
 from fastapi.testclient import TestClient
-from app.main import app
+from backend.app.main import app
+
 
 client = TestClient(app)
 
 
 def test_invalid_file_type():
     response = client.post(
-        "/upload",
-        files={
-            "file": (
-                "sample.txt",
-                b"Hello World",
-                "text/plain"
-            )
-        }
+        "/upload", files={"file": ("sample.txt", b"Hello World", "text/plain")}
     )
 
     assert response.status_code == 400
@@ -21,21 +16,21 @@ def test_invalid_file_type():
 
 def test_empty_pdf():
     response = client.post(
-        "/upload",
-        files={
-            "file": (
-                "empty.pdf",
-                b"",
-                "application/pdf"
-            )
-        }
+        "/upload", files={"file": ("empty.pdf", b"", "application/pdf")}
     )
 
     assert response.status_code == 400
 
 
 def test_valid_pdf():
-    pdf_content = b"%PDF-1.4\nTest PDF"
+    document = fitz.open()
+
+    page = document.new_page()
+    page.insert_text((72, 72), "Test PDF document")
+
+    pdf_content = document.tobytes()
+
+    document.close()
 
     response = client.post(
         "/upload",
@@ -43,9 +38,9 @@ def test_valid_pdf():
             "file": (
                 "sample.pdf",
                 pdf_content,
-                "application/pdf"
+                "application/pdf",
             )
-        }
+        },
     )
 
     assert response.status_code == 200

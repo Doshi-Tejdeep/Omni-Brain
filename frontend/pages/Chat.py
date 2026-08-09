@@ -18,7 +18,7 @@ def ask_backend(question):
             timeout=120,
         )
 
-       if response.status_code == 200:
+        if response.status_code == 200:
             data = response.json()
 
             answer_data = data.get("answer", "")
@@ -42,7 +42,6 @@ def ask_backend(question):
                 sources = [str(sources)]
 
             return answer, sources
-
 
         return (
             f"Backend error: {response.status_code}",

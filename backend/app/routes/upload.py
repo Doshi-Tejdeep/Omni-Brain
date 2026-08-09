@@ -87,6 +87,7 @@ async def upload_file(file: UploadFile = File(...)):
         print(type(e).__name__, ":", str(e))
 
         import traceback
+
         traceback.print_exc()
 
         print("========================================")
