@@ -2,8 +2,7 @@
 testpaths = [
     "tests",
     "backend/tests",
-    "backend/app",
 ]
 pythonpath = [
-    "backend",
+    ".",
 ]

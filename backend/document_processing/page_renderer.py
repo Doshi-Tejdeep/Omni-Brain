@@ -38,9 +38,7 @@ def render_pdf_page(
 
         pixmap = page.get_pixmap(matrix=matrix, alpha=False)
 
-        output_path = (
-            output_dir / f"page_{page_number}.png"
-        )
+        output_path = output_dir / f"page_{page_number}.png"
 
         pixmap.save(str(output_path))
 
