@@ -36,7 +36,7 @@ class VectorStore:
 
         self.connected = True
 
-    def add_document(self, document):
+    def add_document(self, document, document_id):
         """
         Store document chunks and their embeddings in ChromaDB.
         """
@@ -53,14 +53,17 @@ class VectorStore:
             ids.append(str(uuid.uuid4()))
             texts.append(chunk["text"])
             embeddings.append(chunk["embedding"])
-            metadatas.append(
-    {
-        "page_number": str(chunk.get("page_number") or "unknown"),
-        "chunk_id": str(chunk["chunk_id"])
-    }
-)
 
-        # Access the underlying Chroma collection
+            metadatas.append(
+                {
+                    "page_number": str(
+                        chunk.get("page_number") or "unknown"
+                    ),
+                    "chunk_id": str(chunk["chunk_id"]),
+                    "document_id": str(document_id),
+                }
+            )
+
         self.vector_db._collection.add(
             ids=ids,
             documents=texts,
@@ -70,7 +73,7 @@ class VectorStore:
 
         print(f"Stored {len(ids)} chunks successfully.")
 
-    def search(self, query, k=4):
+    def search(self, query, k=4, document_id=None):
         """
         Retrieve the most relevant chunks from ChromaDB.
         """
@@ -79,9 +82,12 @@ class VectorStore:
             self.connect()
 
         results = self.vector_db.similarity_search_with_score(
-        query=query.strip(),
-        k=k,
-         )
+            query=query.strip(),
+            k=k,
+            filter={
+                "document_id": str(document_id)
+            } if document_id else None,
+        )
 
         chunks = []
 
@@ -104,4 +110,6 @@ class VectorStore:
         """
         Delete document embeddings.
         """
-        raise NotImplementedError("Vector DB delete_document() not implemented yet.")
+        raise NotImplementedError(
+            "Vector DB delete_document() not implemented yet."
+        )

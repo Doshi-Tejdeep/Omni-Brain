@@ -1,12 +1,18 @@
 import logging
 import os
 
-os.makedirs("logs", exist_ok=True)
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOG_FILE = os.path.join(LOG_DIR, "app.log")
 
 logging.basicConfig(
-    filename="logs/app.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE),
+        logging.StreamHandler()
+    ]
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("omnibrain")

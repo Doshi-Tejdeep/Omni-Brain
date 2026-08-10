@@ -15,8 +15,6 @@ def sql_agent(state: AgentState) -> AgentState:
 
     print("SQL Agent Executed")
 
-    state["response"] = process_sql_query(
-        state["query"]
-    )
+    state["response"] = process_sql_query(state["query"])
 
     return state
