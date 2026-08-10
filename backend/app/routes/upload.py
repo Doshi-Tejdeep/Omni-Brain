@@ -8,6 +8,7 @@ from backend.app.config import (
 )
 import os
 import shutil
+import uuid
 
 router = APIRouter()
 
@@ -62,13 +63,13 @@ async def upload_file(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        logger.info(f"{file.filename} stored at {file_path}")
-
         logger.info("Indexing uploaded document...")
 
-        index_document(file_path)
+        document_id = str(uuid.uuid4())
 
-        logger.info("Document indexed successfully.")
+        index_document(file_path, document_id)
+
+        logger.info(f"Document indexed successfully.")
 
         logger.info(f"{file.filename} uploaded successfully")
         return {
@@ -76,6 +77,7 @@ async def upload_file(file: UploadFile = File(...)):
             "filename": file.filename,
             "content_type": file.content_type,
             "path": file_path,
+            "document_id": document_id,
         }
 
     except HTTPException:

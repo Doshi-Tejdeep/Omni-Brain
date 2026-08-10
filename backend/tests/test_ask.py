@@ -7,7 +7,13 @@ client = TestClient(app)
 
 
 def test_empty_question():
-    response = client.post("/ask", json={"question": ""})
+    response = client.post(
+        "/ask",
+        json={
+            "question": "",
+            "document_id": "test-document-id",
+        },
+    )
 
     assert response.status_code == 400
 
@@ -22,7 +28,10 @@ def test_valid_question(mock_generate_answer):
 
     response = client.post(
         "/ask",
-        json={"question": "What is OmniBrain?"},
+        json={
+            "question": "What is OmniBrain?",
+            "document_id": "test-document-id",
+        },
     )
 
     assert response.status_code == 200

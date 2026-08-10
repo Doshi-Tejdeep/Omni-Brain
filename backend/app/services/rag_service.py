@@ -4,7 +4,7 @@ from backend.app.prompts import SEARCH_PROMPT
 import traceback
 
 
-async def generate_answer(question: str):
+async def generate_answer(question: str, document_id: str):
     """
     Executes the complete RAG pipeline:
     1. Search ChromaDB
@@ -27,7 +27,11 @@ async def generate_answer(question: str):
         vector_store = VectorStore()
 
         print("2. Searching ChromaDB...")
-        chunks = vector_store.search(question, k=8)
+        chunks = vector_store.search(
+            question,
+            k=8,
+            document_id=document_id,
+        )
 
         print(f"Retrieved {len(chunks)} chunks")
 

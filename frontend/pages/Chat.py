@@ -10,11 +10,14 @@ st.set_page_config(
 )
 
 
-def ask_backend(question):
+def ask_backend(question, document_id):
     try:
         response = requests.post(
             f"{BACKEND_URL}/ask",
-            json={"question": question},
+            json={
+                "question": question,
+                "document_id": document_id,
+            },
             timeout=120,
         )
 
@@ -59,8 +62,10 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 if "questions_asked" not in st.session_state:
-    st.session_state.questions_asked = 0
-
+    st.session_state.questions_asked =0 
+      
+if "document_id" not in st.session_state:
+    st.session_state.document_id = None
 
 st.title("🧠 OmniBrain Chat")
 st.caption("Ask questions about your uploaded documents.")
@@ -91,7 +96,10 @@ if query:
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            answer, sources = ask_backend(query)
+            answer, sources = ask_backend(
+                query,
+                st.session_state.document_id,
+            )
 
         st.markdown(
             f'<div class="answer-card">{answer}</div>',

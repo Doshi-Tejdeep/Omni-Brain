@@ -1,9 +1,7 @@
 import io
 from unittest.mock import MagicMock, patch
-
 from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
-
 from backend.app.main import app
 
 client = TestClient(app)
@@ -72,13 +70,19 @@ def test_upload_to_rag_pipeline(
     )
 
     assert upload_response.status_code == 200
+    upload_data = upload_response.json()
+    document_id = upload_data["document_id"]
 
     ask_response = client.post(
         "/ask",
-        json={"question": "What is OmniBrain?"},
+        json={
+            "question": "What is OmniBrain?",
+            "document_id": document_id,
+        },
     )
 
     assert ask_response.status_code == 200
+    
 
     data = ask_response.json()
 
