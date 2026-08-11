@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "http://backend:8000"
 
 st.set_page_config(
     page_title="OmniBrain Chat",
@@ -15,7 +15,7 @@ def ask_backend(question):
         response = requests.post(
             f"{BACKEND_URL}/ask",
             json={"question": question},
-            timeout=120,
+            timeout=300,
         )
 
         if response.status_code == 200:
