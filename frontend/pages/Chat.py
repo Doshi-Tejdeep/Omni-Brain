@@ -46,8 +46,14 @@ def ask_backend(question, document_id):
 
             return answer, sources
 
+        try:
+            error_data = response.json()
+            detail = error_data.get("detail", response.text)
+        except ValueError:
+            detail = response.text
+
         return (
-            f"Backend error: {response.status_code}",
+            f"Backend error ({response.status_code}): {detail}",
             [],
         )
 
@@ -62,10 +68,10 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 if "questions_asked" not in st.session_state:
-    st.session_state.questions_asked =0 
+    st.session_state.questions_asked = 0
       
-if "document_id" not in st.session_state:
-    st.session_state.document_id = None
+if "processed_document_id" not in st.session_state:
+    st.session_state.processed_document_id = None
 
 st.title("🧠 OmniBrain Chat")
 st.caption("Ask questions about your uploaded documents.")
@@ -91,6 +97,11 @@ for entry in st.session_state.chat_history:
 query = st.chat_input("Ask a question about your document...")
 
 if query:
+    st.write(
+        "DEBUG document ID:",
+        st.session_state.processed_document_id,
+    )
+
     with st.chat_message("user"):
         st.write(query)
 
@@ -98,7 +109,7 @@ if query:
         with st.spinner("Thinking..."):
             answer, sources = ask_backend(
                 query,
-                st.session_state.document_id,
+                st.session_state.processed_document_id,
             )
 
         st.markdown(
