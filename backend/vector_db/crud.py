@@ -11,6 +11,7 @@ from .models import Document, History, Session
 # DOCUMENT CRUD
 # ==========================
 
+
 def create_document(db: DBSession, document: Document):
     db.add(document)
     db.commit()
@@ -55,6 +56,7 @@ def delete_document(db: DBSession, document_id: int):
 # HISTORY CRUD
 # ==========================
 
+
 def create_history(db: DBSession, history: History):
     db.add(history)
     db.commit()
@@ -85,6 +87,7 @@ def delete_history(db: DBSession, history_id: int):
 # SESSION CRUD
 # ==========================
 
+
 def create_session(db: DBSession, session: Session):
     db.add(session)
     db.commit()
@@ -93,11 +96,7 @@ def create_session(db: DBSession, session: Session):
 
 
 def get_session(db: DBSession, session_id: str):
-    return (
-        db.query(Session)
-        .filter(Session.session_id == session_id)
-        .first()
-    )
+    return db.query(Session).filter(Session.session_id == session_id).first()
 
 
 def get_all_sessions(db: DBSession):
@@ -119,6 +118,7 @@ def delete_session(db: DBSession, session_id: str):
 # CHAT HISTORY CRUD
 # ==========================
 
+
 def create_chat_history(db: DBSession, history: History):
     db.add(history)
     db.commit()
@@ -136,11 +136,7 @@ def get_chat_history(db: DBSession, session_id: str):
 
 
 def delete_chat_history(db: DBSession, session_id: str):
-    history = (
-        db.query(History)
-        .filter(History.session_id == session_id)
-        .all()
-    )
+    history = db.query(History).filter(History.session_id == session_id).all()
 
     if not history:
         return None
@@ -151,16 +147,14 @@ def delete_chat_history(db: DBSession, session_id: str):
     db.commit()
     return True
 
+
 # ==========================
 # CONVERSATION MANAGEMENT
 # ==========================
 
+
 def rename_session(db: DBSession, session_id: str, new_title: str):
-    session = (
-        db.query(Session)
-        .filter(Session.session_id == session_id)
-        .first()
-    )
+    session = db.query(Session).filter(Session.session_id == session_id).first()
 
     if not session:
         return None
@@ -174,22 +168,13 @@ def rename_session(db: DBSession, session_id: str, new_title: str):
 
 
 def get_recent_sessions(db: DBSession, limit: int = 10):
-    return (
-        db.query(Session)
-        .order_by(Session.created_at.desc())
-        .limit(limit)
-        .all()
-    )
+    return db.query(Session).order_by(Session.created_at.desc()).limit(limit).all()
 
 
 def delete_conversation(db: DBSession, session_id: str):
     delete_chat_history(db, session_id)
 
-    session = (
-        db.query(Session)
-        .filter(Session.session_id == session_id)
-        .first()
-    )
+    session = db.query(Session).filter(Session.session_id == session_id).first()
 
     if session:
         db.delete(session)

@@ -6,7 +6,7 @@ from backend.vector_db.embeddings import get_embeddings
 from backend.vector_db.vector_store import VectorStore
 
 
-def index_document(pdf_path):
+def index_document(pdf_path, document_id):
     """
     Extract text from a PDF, split it into chunks,
     generate embeddings for each chunk,
@@ -31,6 +31,6 @@ def index_document(pdf_path):
 
     db = VectorStore()
     db.connect()
-    db.add_document(chunks)
+    db.add_document(chunks, document_id)
 
     return chunks

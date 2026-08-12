@@ -13,6 +13,11 @@ class QuestionRequest(BaseModel):
         example="What is OmniBrain?",
     )
 
+    document_id: str = Field(
+        ...,
+        description="ID of the uploaded document",
+    )
+
 
 @router.post(
     "/ask",
@@ -34,11 +39,15 @@ async def ask_question(request: QuestionRequest):
 
         logger.info(f"Question received: {request.question}")
 
-        answer = await generate_answer(request.question)
+        answer = await generate_answer(
+            request.question,
+            request.document_id,
+        )
 
         return {
             "question": request.question,
-            "answer": answer,
+            "answer": answer["answer"],
+            "sources": answer["sources"],
         }
 
     except HTTPException:

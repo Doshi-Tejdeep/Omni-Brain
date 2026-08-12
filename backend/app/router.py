@@ -20,7 +20,14 @@ SQL_KEYWORDS = {
     "history",
     "conversation",
 }
-VISION_KEYWORDS = {"image", "chart", "graph", "plot", "photo"}
+VISION_KEYWORDS = VISION_KEYWORDS = {
+    "image",
+    "chart",
+    "graph",
+    "plot",
+    "photo",
+    "figure",
+}
 
 
 def route_query(state: AgentState) -> AgentState:

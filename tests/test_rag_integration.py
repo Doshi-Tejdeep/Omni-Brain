@@ -1,9 +1,7 @@
 import io
 from unittest.mock import MagicMock, patch
-
 from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
-
 from backend.app.main import app
 
 client = TestClient(app)
@@ -14,16 +12,10 @@ def create_test_pdf():
 
     pdf = canvas.Canvas(buffer)
 
-    pdf.drawString(
-        100,
-        750,
-        "OmniBrain is an Agentic Multi Modal RAG Orchestrator."
-    )
+    pdf.drawString(100, 750, "OmniBrain is an Agentic Multi Modal RAG Orchestrator.")
 
     pdf.drawString(
-        100,
-        730,
-        "It uses document processing, embeddings and vector search."
+        100, 730, "It uses document processing, embeddings and vector search."
     )
 
     pdf.save()
@@ -78,23 +70,27 @@ def test_upload_to_rag_pipeline(
     )
 
     assert upload_response.status_code == 200
+    upload_data = upload_response.json()
+    document_id = upload_data["document_id"]
 
     ask_response = client.post(
         "/ask",
         json={
-            "question": "What is OmniBrain?"
+            "question": "What is OmniBrain?",
+            "document_id": document_id,
         },
     )
 
     assert ask_response.status_code == 200
+    
 
     data = ask_response.json()
 
     assert "question" in data
     assert "answer" in data
+    assert "sources" in data
 
-    assert "answer" in data["answer"]
-    assert "sources" in data["answer"]
+    assert data["answer"] == "OmniBrain is an Agentic Multi Modal RAG Orchestrator."
+    assert "Page 1" in data["sources"]
 
-    assert len(data["answer"]["answer"]) > 0
-    assert len(data["answer"]["sources"]) > 0
+    assert len(data["answer"]) > 0
