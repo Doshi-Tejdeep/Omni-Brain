@@ -3,7 +3,6 @@ Database migration utility.
 """
 
 from .database import Base, engine
-from . import models  # Import models so SQLAlchemy registers them
 
 
 def create_tables():

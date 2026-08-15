@@ -69,9 +69,9 @@ class VectorStore:
 
             metadatas.append(
                 {
-                    "document_id": document_id,
                     "page_number": str(chunk.get("page_number") or "unknown"),
                     "chunk_id": str(chunk.get("chunk_id", 0)),
+                    "document_id": str(document_id),
                 }
             )
 
@@ -98,7 +98,7 @@ class VectorStore:
         filter_metadata = None
 
         if document_id:
-            filter_metadata = {"document_id": document_id}
+            filter_metadata = {"document_id": str(document_id)}
 
         results = self.vector_db.similarity_search_with_score(
             query=query.strip(),
@@ -161,6 +161,6 @@ class VectorStore:
         if not self.connected:
             self.connect()
 
-        self.vector_db._collection.delete(where={"document_id": document_id})
+        self.vector_db._collection.delete(where={"document_id": str(document_id)})
 
         print(f"Deleted document embeddings: {document_id}")

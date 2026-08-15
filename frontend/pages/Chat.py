@@ -23,13 +23,37 @@ def ask_backend(question, document_id):
 
         if response.status_code == 200:
             data = response.json()
-            return (
-                data.get("answer", "No answer received."),
-                data.get("sources", []),
-            )
+
+            answer_data = data.get("answer", "")
+            sources = data.get("sources", [])
+
+            # Backend may return the RAG result as a nested dictionary
+            if isinstance(answer_data, dict):
+                answer = answer_data.get("answer", "")
+                sources = answer_data.get("sources", sources)
+            else:
+                answer = answer_data
+
+            # Make absolutely sure Streamlit receives plain text
+            if isinstance(answer, dict):
+                answer = answer.get("answer", "")
+
+            if not isinstance(answer, str):
+                answer = str(answer)
+
+            if not isinstance(sources, list):
+                sources = [str(sources)]
+
+            return answer, sources
+
+        try:
+            error_data = response.json()
+            detail = error_data.get("detail", response.text)
+        except ValueError:
+            detail = response.text
 
         return (
-            f"Backend error: {response.status_code}",
+            f"Backend error ({response.status_code}): {detail}",
             [],
         )
 
@@ -46,6 +70,8 @@ if "chat_history" not in st.session_state:
 if "questions_asked" not in st.session_state:
     st.session_state.questions_asked = 0
 
+if "processed_document_id" not in st.session_state:
+    st.session_state.processed_document_id = None
 
 st.title("🧠 OmniBrain Chat")
 st.caption("Ask questions about your uploaded documents.")
@@ -72,6 +98,7 @@ document_id = st.session_state.get("processed_document_id")
 
 if not document_id:
     st.info("Please upload a document before asking questions.")
+
 query = st.chat_input("Ask a question about your document...")
 
 if query and document_id:

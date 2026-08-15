@@ -18,6 +18,11 @@ class QuestionRequest(BaseModel):
         description="ID of the document to search",
     )
 
+    document_id: str = Field(
+        ...,
+        description="ID of the uploaded document",
+    )
+
 
 @router.post(
     "/ask",
@@ -46,7 +51,8 @@ async def ask_question(request: QuestionRequest):
 
         return {
             "question": request.question,
-            "answer": answer,
+            "answer": answer["answer"],
+            "sources": answer["sources"],
         }
 
     except HTTPException:

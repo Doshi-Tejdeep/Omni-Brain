@@ -5,7 +5,7 @@ initial_state = {
     "query": "What is Artificial Intelligence?",
     "route": "",
     "context": "",
-    "response": ""
+    "response": "",
 }
 
 # Execute the graph
