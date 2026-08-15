@@ -10,7 +10,12 @@ class QuestionRequest(BaseModel):
     question: str = Field(
         ...,
         description="Question asked by the user",
-        example="What is OmniBrain?",
+        example="What is renewable energy?",
+    )
+
+    document_id: str = Field(
+        ...,
+        description="ID of the document to search",
     )
 
 
@@ -34,7 +39,10 @@ async def ask_question(request: QuestionRequest):
 
         logger.info(f"Question received: {request.question}")
 
-        answer = await generate_answer(request.question)
+        answer = await generate_answer(
+            request.question,
+            request.document_id,
+        )
 
         return {
             "question": request.question,

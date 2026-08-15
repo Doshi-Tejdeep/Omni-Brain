@@ -32,17 +32,28 @@ class VectorStore:
             persist_directory=CHROMA_DB_PATH,
         )
 
-        print(self.vector_db._collection.count())
+        print(
+            f"Vector store connected. "
+            f"Current chunks: {self.vector_db._collection.count()}"
+        )
 
         self.connected = True
 
-    def add_document(self, document):
+    def add_document(self, document, document_id=None):
         """
         Store document chunks and their embeddings in ChromaDB.
+
+        Each chunk receives a document_id so different uploaded
+        documents can be separated during retrieval.
         """
 
         if not self.connected:
             self.connect()
+
+        if not document:
+            return
+
+        document_id = document_id or str(uuid.uuid4())
 
         ids = []
         texts = []
@@ -50,17 +61,20 @@ class VectorStore:
         metadatas = []
 
         for chunk in document:
-            ids.append(str(uuid.uuid4()))
+            chunk_id = str(uuid.uuid4())
+
+            ids.append(chunk_id)
             texts.append(chunk["text"])
             embeddings.append(chunk["embedding"])
-            metadatas.append(
-    {
-        "page_number": str(chunk.get("page_number") or "unknown"),
-        "chunk_id": str(chunk["chunk_id"])
-    }
-)
 
-        # Access the underlying Chroma collection
+            metadatas.append(
+                {
+                    "document_id": document_id,
+                    "page_number": str(chunk.get("page_number") or "unknown"),
+                    "chunk_id": str(chunk.get("chunk_id", 0)),
+                }
+            )
+
         self.vector_db._collection.add(
             ids=ids,
             documents=texts,
@@ -68,33 +82,72 @@ class VectorStore:
             metadatas=metadatas,
         )
 
-        print(f"Stored {len(ids)} chunks successfully.")
+        print(f"Stored {len(ids)} chunks successfully " f"for document {document_id}.")
 
-    def search(self, query, k=4):
+    def search(self, query, k=4, document_id=None):
         """
         Retrieve the most relevant chunks from ChromaDB.
+
+        If document_id is supplied, only chunks belonging to that
+        document are retrieved.
         """
 
         if not self.connected:
             self.connect()
 
+        filter_metadata = None
+
+        if document_id:
+            filter_metadata = {"document_id": document_id}
+
         results = self.vector_db.similarity_search_with_score(
-        query=query.strip(),
-        k=k,
-         )
+            query=query.strip(),
+            k=k,
+            filter=filter_metadata,
+        )
 
         chunks = []
+        seen = set()
 
         for doc, score in results:
-            print(f"\nPage: {doc.metadata['page_number']}")
-            print(f"Chunk: {doc.metadata['chunk_id']}")
+            page_number = doc.metadata.get(
+                "page_number",
+                "unknown",
+            )
+
+            chunk_id = doc.metadata.get(
+                "chunk_id",
+                "unknown",
+            )
+
+            document_id_value = doc.metadata.get(
+                "document_id",
+                "unknown",
+            )
+
+            # Prevent duplicate chunks from entering the context.
+            unique_key = (
+                document_id_value,
+                page_number,
+                chunk_id,
+            )
+
+            if unique_key in seen:
+                continue
+
+            seen.add(unique_key)
+
+            print(f"\nPage: {page_number}")
+            print(f"Chunk: {chunk_id}")
+            print(f"Document: {document_id_value}")
             print(f"Score: {score}")
 
             chunks.append(
                 {
                     "text": doc.page_content,
-                    "page_number": doc.metadata["page_number"],
-                    "chunk_id": doc.metadata["chunk_id"],
+                    "page_number": page_number,
+                    "chunk_id": chunk_id,
+                    "document_id": document_id_value,
                 }
             )
 
@@ -102,6 +155,12 @@ class VectorStore:
 
     def delete_document(self, document_id):
         """
-        Delete document embeddings.
+        Delete all embeddings belonging to a document.
         """
-        raise NotImplementedError("Vector DB delete_document() not implemented yet.")
+
+        if not self.connected:
+            self.connect()
+
+        self.vector_db._collection.delete(where={"document_id": document_id})
+
+        print(f"Deleted document embeddings: {document_id}")

@@ -66,7 +66,7 @@ async def upload_file(file: UploadFile = File(...)):
 
         logger.info("Indexing uploaded document...")
 
-        index_document(file_path)
+        document_id = index_document(file_path)
 
         logger.info("Document indexed successfully.")
 
@@ -76,6 +76,7 @@ async def upload_file(file: UploadFile = File(...)):
             "filename": file.filename,
             "content_type": file.content_type,
             "path": file_path,
+            "document_id": document_id,
         }
 
     except HTTPException:
@@ -85,5 +86,5 @@ async def upload_file(file: UploadFile = File(...)):
         logger.exception("Upload failed")
         raise HTTPException(
             status_code=500,
-            detail="Internal Server Error", 
+            detail="Internal Server Error",
         )

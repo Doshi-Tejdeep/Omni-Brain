@@ -14,16 +14,10 @@ def create_test_pdf():
 
     pdf = canvas.Canvas(buffer)
 
-    pdf.drawString(
-        100,
-        750,
-        "OmniBrain is an Agentic Multi Modal RAG Orchestrator."
-    )
+    pdf.drawString(100, 750, "OmniBrain is an Agentic Multi Modal RAG Orchestrator.")
 
     pdf.drawString(
-        100,
-        730,
-        "It uses document processing, embeddings and vector search."
+        100, 730, "It uses document processing, embeddings and vector search."
     )
 
     pdf.save()
@@ -66,6 +60,7 @@ def test_upload_to_rag_pipeline(
 
     pdf_content = create_test_pdf()
 
+    # Upload document
     upload_response = client.post(
         "/upload",
         files={
@@ -79,10 +74,20 @@ def test_upload_to_rag_pipeline(
 
     assert upload_response.status_code == 200
 
+    # Get document ID returned by upload
+    upload_data = upload_response.json()
+
+    assert "document_id" in upload_data
+    document_id = upload_data["document_id"]
+
+    assert document_id is not None
+
+    # Ask question using the uploaded document
     ask_response = client.post(
         "/ask",
         json={
-            "question": "What is OmniBrain?"
+            "question": "What is OmniBrain?",
+            "document_id": document_id,
         },
     )
 

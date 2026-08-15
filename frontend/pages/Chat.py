@@ -10,11 +10,14 @@ st.set_page_config(
 )
 
 
-def ask_backend(question):
+def ask_backend(question, document_id):
     try:
         response = requests.post(
             f"{BACKEND_URL}/ask",
-            json={"question": question},
+            json={
+                "question": question,
+                "document_id": document_id,
+            },
             timeout=300,
         )
 
@@ -65,15 +68,19 @@ for entry in st.session_state.chat_history:
                     st.markdown(f"- {src}")
 
 
+document_id = st.session_state.get("processed_document_id")
+
+if not document_id:
+    st.info("Please upload a document before asking questions.")
 query = st.chat_input("Ask a question about your document...")
 
-if query:
+if query and document_id:
     with st.chat_message("user"):
         st.write(query)
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            answer, sources = ask_backend(query)
+            answer, sources = ask_backend(query, document_id)
 
         st.markdown(
             f'<div class="answer-card">{answer}</div>',

@@ -768,7 +768,7 @@ if st.session_state.is_uploading and st.session_state.pending_file_bytes is not 
             result = response.json()
 
             st.session_state.uploaded_file = result.get("filename", file_name)
-            st.session_state.processed_document_id = file_id
+            st.session_state.processed_document_id = result.get("document_id")
             st.session_state.workspace_status = "Ready"
 
             if st.session_state.last_uploaded_file_id != file_id:
