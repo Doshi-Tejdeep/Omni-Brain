@@ -18,7 +18,7 @@ def ask_backend(question, document_id):
                 "question": question,
                 "document_id": document_id,
             },
-            timeout=120,
+            timeout=300,
         )
 
         if response.status_code == 200:
@@ -69,7 +69,7 @@ if "chat_history" not in st.session_state:
 
 if "questions_asked" not in st.session_state:
     st.session_state.questions_asked = 0
-      
+
 if "processed_document_id" not in st.session_state:
     st.session_state.processed_document_id = None
 
@@ -94,23 +94,20 @@ for entry in st.session_state.chat_history:
                     st.markdown(f"- {src}")
 
 
+document_id = st.session_state.get("processed_document_id")
+
+if not document_id:
+    st.info("Please upload a document before asking questions.")
+
 query = st.chat_input("Ask a question about your document...")
 
-if query:
-    st.write(
-        "DEBUG document ID:",
-        st.session_state.processed_document_id,
-    )
-
+if query and document_id:
     with st.chat_message("user"):
         st.write(query)
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            answer, sources = ask_backend(
-                query,
-                st.session_state.processed_document_id,
-            )
+            answer, sources = ask_backend(query, document_id)
 
         st.markdown(
             f'<div class="answer-card">{answer}</div>',

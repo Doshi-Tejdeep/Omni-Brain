@@ -24,7 +24,7 @@ def test_valid_question(mock_generate_answer):
         "question": "What is OmniBrain?",
         "answer": "OmniBrain is an AI-powered document intelligence system.",
         "sources": [],
-    }   
+    }
 
     response = client.post(
         "/ask",
