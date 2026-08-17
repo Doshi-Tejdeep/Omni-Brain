@@ -8,6 +8,7 @@ from backend.app.config import (
 )
 import os
 import shutil
+import uuid
 
 router = APIRouter()
 
@@ -29,7 +30,10 @@ async def upload_file(file: UploadFile = File(...)):
         logger.info(f"Upload request received: {file.filename}")
 
         if not file.filename.lower().endswith(".pdf"):
-            raise HTTPException(status_code=400, detail="Invalid filename.")
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid filename.",
+            )
 
         if file.content_type not in ALLOWED_FILE_TYPES:
             logger.warning(f"Invalid file uploaded: {file.filename}")
@@ -66,16 +70,19 @@ async def upload_file(file: UploadFile = File(...)):
 
         logger.info("Indexing uploaded document...")
 
-        index_document(file_path)
+        document_id = str(uuid.uuid4())
+
+        index_document(file_path, document_id)
 
         logger.info("Document indexed successfully.")
-
         logger.info(f"{file.filename} uploaded successfully")
+
         return {
             "message": "File uploaded successfully",
             "filename": file.filename,
             "content_type": file.content_type,
             "path": file_path,
+            "document_id": document_id,
         }
 
     except HTTPException:
@@ -85,5 +92,5 @@ async def upload_file(file: UploadFile = File(...)):
         logger.exception("Upload failed")
         raise HTTPException(
             status_code=500,
-            detail="Internal Server Error", 
+            detail="Internal Server Error",
         )

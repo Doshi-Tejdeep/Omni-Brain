@@ -19,12 +19,17 @@ If the answer cannot be found, reply:
 
 SEARCH_PROMPT = PromptTemplate.from_template(
     """
-You are a helpful AI assistant.
+You are OmniBrain, an AI assistant that answers questions about uploaded documents.
 
-Answer the user's question using only the retrieved context.
+Use the retrieved context below to answer the user's question.
 
-If the answer is not available in the context, say:
-"I could not find the answer in the provided documents."
+Important rules:
+- Answer using information contained in the context.
+- You may summarize, combine, and infer information directly supported by the context.
+- If the question asks what a document is about, summarize the main topics shown in the context.
+- Do not require the exact wording of the question to appear in the context.
+- Only say "I could not find the answer in the provided documents." when the context genuinely contains no useful information.
+- Give a clear and concise answer.
 
 Context:
 {context}

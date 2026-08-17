@@ -79,10 +79,14 @@ def test_upload_to_rag_pipeline(
 
     assert upload_response.status_code == 200
 
+    upload_data = upload_response.json()
+    document_id = upload_data["document_id"]
+
     ask_response = client.post(
         "/ask",
         json={
-            "question": "What is OmniBrain?"
+            "question": "What is OmniBrain?",
+            "document_id": document_id,
         },
     )
 
@@ -92,9 +96,7 @@ def test_upload_to_rag_pipeline(
 
     assert "question" in data
     assert "answer" in data
+    assert "sources" in data
 
-    assert "answer" in data["answer"]
-    assert "sources" in data["answer"]
-
-    assert len(data["answer"]["answer"]) > 0
-    assert len(data["answer"]["sources"]) > 0
+    assert len(data["answer"]) > 0
+    assert len(data["sources"]) > 0
