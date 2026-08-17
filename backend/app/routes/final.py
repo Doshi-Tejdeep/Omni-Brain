@@ -18,7 +18,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 )
 async def final_api(
     question: str = Form(...),
+    document_id: str = Form(...),
     image: UploadFile = File(...),
+
 ):
     try:
         logger.info(f"Final API request received: {image.filename}")
@@ -53,7 +55,10 @@ async def final_api(
 
         logger.info(f"Image stored at {file_path}")
 
-        answer = await generate_answer(question)
+        answer = await generate_answer(
+            question,
+            document_id,
+        )
 
         return {
             "message": "Final API executed successfully",
