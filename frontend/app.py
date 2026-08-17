@@ -698,7 +698,7 @@ elif st.session_state.page == "Chat":
                         resp = requests.post(
                             f"{BACKEND_URL}/ask",
                             json={"question": query},
-                            timeout=30,
+                            timeout=300,
                         )
                         if resp.status_code == 200:
                             data = resp.json()

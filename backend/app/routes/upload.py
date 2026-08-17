@@ -69,9 +69,10 @@ async def upload_file(file: UploadFile = File(...)):
 
         index_document(file_path, document_id)
 
-        logger.info(f"Document indexed successfully.")
+        logger.info("Document indexed successfully.")
 
         logger.info(f"{file.filename} uploaded successfully")
+
         return {
             "message": "File uploaded successfully",
             "filename": file.filename,
@@ -93,6 +94,7 @@ async def upload_file(file: UploadFile = File(...)):
         traceback.print_exc()
 
         print("========================================")
+
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error",

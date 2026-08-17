@@ -4,7 +4,10 @@ from backend.app.prompts import SEARCH_PROMPT
 import traceback
 
 
-async def generate_answer(question: str, document_id: str):
+async def generate_answer(
+    question: str,
+    document_id: str,
+):
     """
     Executes the complete RAG pipeline:
     1. Search ChromaDB

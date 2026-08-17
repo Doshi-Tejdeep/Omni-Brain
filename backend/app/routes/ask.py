@@ -10,7 +10,12 @@ class QuestionRequest(BaseModel):
     question: str = Field(
         ...,
         description="Question asked by the user",
-        example="What is OmniBrain?",
+        example="What is renewable energy?",
+    )
+
+    document_id: str = Field(
+        ...,
+        description="ID of the document to search",
     )
 
     document_id: str = Field(
