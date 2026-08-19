@@ -1,33 +1,3 @@
-<<<<<<< HEAD
-import ollama
-
-
-MODEL_NAME = "gemma3"
-
-
-def analyze_image(image_path: str, question: str = None) -> str:
-    if question:
-        prompt = question
-    else:
-        prompt = (
-            "Analyze this image carefully. "
-            "Describe what is visible in the image, including important "
-            "objects, text, diagrams, screenshots, or other relevant details."
-        )
-
-    response = ollama.chat(
-        model=MODEL_NAME,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-                "images": [image_path],
-            }
-        ],
-    )
-
-    return response.message.content
-=======
 import os
 
 from dotenv import load_dotenv
@@ -40,7 +10,7 @@ load_dotenv()
 MODEL_NAME = "gemini-3.5-flash"
 
 
-def analyze_image(image_path: str, question: str) -> str:
+def analyze_image(image_path: str, question: str = None) -> str:
     """
     Analyze an image using Google Gemini Vision.
     """
@@ -85,7 +55,7 @@ def analyze_image(image_path: str, question: str) -> str:
         api_key=api_key
     )
 
-    prompt = question.strip()
+    prompt = question.strip() if question else ""
 
     if not prompt:
         prompt = (
@@ -110,4 +80,3 @@ def analyze_image(image_path: str, question: str) -> str:
         return "Gemini returned an empty response."
 
     return response.text
->>>>>>> 75da286 (fix: centralize Gemini vision analysis in final endpoint)
