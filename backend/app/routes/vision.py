@@ -1,71 +1,72 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from backend.app.utils.logger import logger
-from backend.app.config import UPLOAD_DIR
-
 import os
-import ollama
+import uuid
+
+from fastapi import APIRouter, File, HTTPException, UploadFile
+
+from backend.app.config import UPLOAD_DIR
+from backend.app.utils.logger import logger
 
 
 router = APIRouter()
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Ollama vision model
-VISION_MODEL = "gemma3"
-
 
 @router.post(
     "/vision",
-    summary="Vision API",
-    description="Uploads an image and analyzes it using a vision model.",
+    summary="Vision Image Upload",
+    description="Uploads an image for later multimodal processing. Gemini analysis is performed only by /final.",
     responses={
-        200: {"description": "Image analyzed successfully"},
+        200: {"description": "Image uploaded successfully"},
         400: {"description": "Invalid image"},
         500: {"description": "Internal Server Error"},
     },
 )
 async def vision_api(file: UploadFile = File(...)):
     try:
-        logger.info(f"Vision request received: {file.filename}")
+        logger.info(
+            f"Vision image upload received: {file.filename}"
+        )
 
         # ---------------------------------------------------------
-        # 1. Validate image type
+        # 1. Validate image
         # ---------------------------------------------------------
-        allowed_types = [
+
+        allowed_types = {
             "image/png",
             "image/jpeg",
             "image/jpg",
-        ]
+            "image/webp",
+        }
 
         if file.content_type not in allowed_types:
-            logger.warning(
-                f"Invalid image uploaded: {file.filename}"
-            )
-
             raise HTTPException(
                 status_code=400,
-                detail="Only PNG and JPG images are allowed.",
+                detail=(
+                    "Only PNG, JPG, JPEG, and WEBP "
+                    "images are allowed."
+                ),
             )
 
         # ---------------------------------------------------------
         # 2. Read image
         # ---------------------------------------------------------
+
         content = await file.read()
 
-        if len(content) == 0:
-            logger.warning(
-                f"Empty image uploaded: {file.filename}"
-            )
-
+        if not content:
             raise HTTPException(
                 status_code=400,
                 detail="Uploaded image is empty.",
             )
 
         # ---------------------------------------------------------
-        # 3. Create safe filename
+        # 3. Safe filename
         # ---------------------------------------------------------
-        safe_filename = os.path.basename(file.filename)
+
+        safe_filename = os.path.basename(
+            file.filename or "uploaded_image"
+        )
 
         file_path = os.path.join(
             UPLOAD_DIR,
@@ -75,67 +76,45 @@ async def vision_api(file: UploadFile = File(...)):
         # ---------------------------------------------------------
         # 4. Save image
         # ---------------------------------------------------------
+
         with open(file_path, "wb") as buffer:
             buffer.write(content)
 
-        logger.info(
-            f"Image stored at {file_path}"
-        )
-
-        # ---------------------------------------------------------
-        # 5. Send image to Ollama / Gemma 3
-        # ---------------------------------------------------------
-        logger.info(
-            f"Sending image to Ollama using {VISION_MODEL}"
-        )
-
-        response = ollama.chat(
-            model=VISION_MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": (
-                        "Analyze this image carefully. "
-                        "Describe what is visible in the image. "
-                        "If there is text, read and explain the important text. "
-                        "If it is a screenshot, explain what the screenshot shows. "
-                        "Be accurate and concise."
-                    ),
-                    "images": [file_path],
-                }
-            ],
-        )
-
-        # ---------------------------------------------------------
-        # 6. Extract model response
-        # ---------------------------------------------------------
-        analysis = response["message"]["content"]
+        image_id = str(uuid.uuid4())
 
         logger.info(
-            f"Vision analysis completed for {file.filename}"
+            f"Image saved successfully: "
+            f"{file_path} ({len(content)} bytes)"
         )
 
         # ---------------------------------------------------------
-        # 7. Return response
+        # IMPORTANT:
+        # Do NOT call Gemini here.
+        # Do NOT call Ollama here.
         # ---------------------------------------------------------
+
         return {
-            "message": "Image analyzed successfully",
+            "message": "Image uploaded successfully",
             "filename": file.filename,
             "content_type": file.content_type,
             "path": file_path,
-            "vision_model": VISION_MODEL,
-            "analysis": analysis,
+            "size_bytes": len(content),
+            "image_id": image_id,
+            "vision_status": (
+                "Image saved successfully. "
+                "Gemini analysis will be performed by /final."
+            ),
         }
 
     except HTTPException:
         raise
 
     except Exception as e:
-        logger.error(
-            f"Vision API failed: {str(e)}"
+        logger.exception(
+            f"Vision image upload failed: {e}"
         )
 
         raise HTTPException(
             status_code=500,
-            detail=f"Vision processing failed: {str(e)}",
+            detail="Internal Server Error",
         )
