@@ -33,6 +33,7 @@ defaults = {
     "workspace_status": "Waiting for upload",
     "uploaded_file": None,
     "uploaded_files": [],  # list of {"name": ..., "status": "Ready"} for the sidebar doc list
+    "processed_document_id": None,
     "page": "Home",
     "chat_history": [],
 }
@@ -432,7 +433,7 @@ with st.sidebar:
     st.markdown("---")
 
     # ---- Navigation ----
-    nav_options = ["Home", "Chat", "Upload"]
+    nav_options = ["Home", "Chat", "Upload", "Vision"]
     current_idx = (
         nav_options.index(st.session_state.page)
         if st.session_state.page in nav_options
@@ -633,31 +634,114 @@ elif st.session_state.page == "Upload":
     file = st.file_uploader("Drag & drop a PDF, or click to browse", type=["pdf"])
 
     if file is not None:
-        progress = st.progress(0, text="Validating document...")
-        for pct, label in [
-            (30, "Validating document..."),
-            (65, "Indexing content..."),
-            (100, "Finalizing..."),
-        ]:
-            time.sleep(0.4)
-            progress.progress(pct, text=label)
+        progress = st.progress(0, text="Uploading document...")
 
-        st.session_state.uploaded_file = file.name
-        st.session_state.prepared_docs += 1
-        st.session_state.workspace_status = "Ready"
+        try:
+            # Send the PDF to the FastAPI backend
+            files = {
+                "file": (
+                    file.name,
+                    file.getvalue(),
+                    "application/pdf",
+                )
+            }
 
-        # keep the sidebar document list in sync, no duplicates on rerun
-        if not any(d["name"] == file.name for d in st.session_state.uploaded_files):
-            st.session_state.uploaded_files.append(
-                {"name": file.name, "status": "Ready"}
+            progress.progress(30, text="Uploading document...")
+
+            response = requests.post(
+                f"{BACKEND_URL}/upload",
+                files=files,
+                timeout=300,
             )
 
-        st.success(f"✅ '{file.name}' is prepared and ready for chat.")
-        st.balloons()
+            progress.progress(70, text="Processing document...")
 
-        if st.button("Go to Ask OmniBrain →"):
-            st.session_state.page = "Chat"
-            st.rerun()
+            if response.status_code == 200:
+                data = response.json()
+
+                # Get document_id from backend response
+                document_id = data.get("document_id")
+
+                if not document_id:
+                    progress.empty()
+                    st.error("❌ Backend did not return a document_id.")
+                else:
+                    # Save document ID for document-scoped RAG
+                    st.session_state.processed_document_id = document_id
+
+                    # Save uploaded file information
+                    st.session_state.uploaded_file = file.name
+                    st.session_state.prepared_docs += 1
+                    st.session_state.workspace_status = "Ready"
+
+                    # Keep sidebar document list in sync
+                    existing_doc = next(
+                        (
+                            doc
+                            for doc in st.session_state.uploaded_files
+                            if doc["name"] == file.name
+                        ),
+                        None,
+                    )
+
+                    if existing_doc is None:
+                        st.session_state.uploaded_files.append(
+                            {
+                                "name": file.name,
+                                "status": "Ready",
+                                "document_id": document_id,
+                            }
+                        )
+                    else:
+                        existing_doc["status"] = "Ready"
+                        existing_doc["document_id"] = document_id
+
+                    progress.progress(100, text="Document ready!")
+
+                    st.success(
+                        f"✅ '{file.name}' uploaded and prepared successfully."
+                    )
+
+                    st.info(f"Document ID: `{document_id}`")
+
+                    st.balloons()
+
+                    if st.button("Go to Ask OmniBrain →"):
+                        st.session_state.page = "Chat"
+                        st.rerun()
+
+            else:
+                progress.empty()
+
+                st.error(
+                    f"❌ Upload failed. Backend returned HTTP "
+                    f"{response.status_code}"
+                )
+
+                try:
+                    st.json(response.json())
+                except Exception:
+                    st.write(response.text)
+
+        except requests.exceptions.ConnectionError:
+            progress.empty()
+
+            st.error(
+                "❌ Cannot connect to the backend. "
+                "Make sure FastAPI is running on "
+                "http://127.0.0.1:8000"
+            )
+
+        except requests.exceptions.Timeout:
+            progress.empty()
+
+            st.error(
+                "❌ Upload timed out. Please check the backend logs."
+            )
+
+        except Exception as e:
+            progress.empty()
+            st.error(f"❌ Unexpected error: {e}")
 
 # ──────────────────────────────────────────────────────────────────────────
 # CHAT PAGE
@@ -672,6 +756,11 @@ elif st.session_state.page == "Chat":
             st.rerun()
     else:
         st.caption(f"Chatting with: **{st.session_state.uploaded_file}**")
+        if not st.session_state.processed_document_id:
+            st.error(
+                "❌ Document ID is missing. Please upload the document again."
+            )
+            st.stop()
 
         # replay previous turns
         for turn in st.session_state.chat_history:
@@ -697,21 +786,31 @@ elif st.session_state.page == "Chat":
                     try:
                         resp = requests.post(
                             f"{BACKEND_URL}/ask",
-                            json={"question": query},
+                            json={
+                                "question": query,
+                                "document_id": st.session_state.processed_document_id,
+                            },
                             timeout=300,
                         )
+
                         if resp.status_code == 200:
                             data = resp.json()
                             answer = data.get("answer", "No answer returned.")
-                            # not in the API yet — read safely so the UI just
-                            # works once Backend/AI-RAG add it, no code change needed
                             sources = data.get("sources", [])
                         else:
-                            answer = f"⚠️ Backend returned an error ({resp.status_code}). Please try again."
+                            answer = (
+                                f"⚠️ Backend returned an error "
+                                f"({resp.status_code}). Please try again."
+                            )
                             sources = []
+
                     except requests.exceptions.ConnectionError:
-                        answer = "⚠️ Can't reach the backend. Make sure the FastAPI server is running on :8000."
+                        answer = (
+                            "⚠️ Can't reach the backend. "
+                            "Make sure the FastAPI server is running on :8000."
+                        )
                         sources = []
+
                     except requests.exceptions.Timeout:
                         answer = "⚠️ The request timed out. Please try again."
                         sources = []
@@ -729,3 +828,155 @@ elif st.session_state.page == "Chat":
             st.session_state.chat_history.append(
                 {"question": query, "answer": answer, "sources": sources}
             )
+# ──────────────────────────────────────────────────────────────────────────
+# VISION PAGE
+# ──────────────────────────────────────────────────────────────────────────
+elif st.session_state.page == "Vision":
+
+    st.markdown("## 🖼️ OmniBrain Vision")
+    st.caption(
+        "Upload an image and ask OmniBrain questions about it."
+    )
+
+    # ---------------------------------------------------------
+    # IMAGE UPLOAD
+    # ---------------------------------------------------------
+
+    image = st.file_uploader(
+        "🖼️ Upload an image",
+        type=["png", "jpg", "jpeg", "webp"],
+        key="vision_image",
+    )
+
+    if image is not None:
+
+        st.image(
+            image,
+            caption=f"Selected image: {image.name}",
+            use_container_width=True,
+        )
+
+        st.markdown("### 💬 Ask a question about this image")
+
+        question = st.text_input(
+            "Your question",
+            placeholder="Example: What is shown in this image?",
+            key="vision_question",
+        )
+
+        if st.button(
+            "🧠 Ask OmniBrain",
+            use_container_width=True,
+        ):
+
+            if not question.strip():
+                st.warning("Please enter a question.")
+
+            else:
+
+                with st.spinner("Analyzing your image..."):
+
+                    try:
+
+                        # Image sent to /final
+                        files = {
+                            "image": (
+                                image.name,
+                                image.getvalue(),
+                                image.type,
+                            )
+                        }
+
+                        # Question sent to /final
+                        data = {
+                            "question": question,
+                        }
+
+                        # -------------------------------------------------
+                        # OPTIONAL PDF DOCUMENT
+                        # -------------------------------------------------
+                        # If a PDF has already been uploaded, include its
+                        # document_id so /final can also use document RAG.
+                        if st.session_state.processed_document_id:
+                            data["document_id"] = (
+                                st.session_state.processed_document_id
+                            )
+
+                        response = requests.post(
+                            f"{BACKEND_URL}/final",
+                            data=data,
+                            files=files,
+                            timeout=300,
+                        )
+
+                        if response.status_code == 200:
+
+                            result = response.json()
+
+                            st.success(
+                                "✅ Image analysis completed."
+                            )
+
+                            st.markdown("### 🧠 OmniBrain Answer")
+
+                            answer = result.get(
+                                "answer",
+                                "No answer returned."
+                            )
+
+                            st.markdown(
+                                f"""
+                                <div class="answer-card">
+                                    {answer}
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+
+                            sources = result.get(
+                                "sources",
+                                []
+                            )
+
+                            if sources:
+
+                                with st.expander(
+                                    f"📚 Sources ({len(sources)})"
+                                ):
+
+                                    for source in sources:
+                                        st.markdown(
+                                            f"- {source}"
+                                        )
+
+                        else:
+
+                            st.error(
+                                f"❌ Final API returned HTTP "
+                                f"{response.status_code}"
+                            )
+
+                            try:
+                                st.json(response.json())
+                            except Exception:
+                                st.write(response.text)
+
+                    except requests.exceptions.ConnectionError:
+
+                        st.error(
+                            "❌ Cannot connect to the backend. "
+                            "Make sure FastAPI is running on "
+                            "http://127.0.0.1:8000"
+                        )
+
+                    except requests.exceptions.Timeout:
+
+                        st.error(
+                            "❌ Image analysis timed out."
+                        )
+
+                    except Exception as e:
+
+                        st.error(
+                            f"❌ Unexpected error: {e}"
+                        )

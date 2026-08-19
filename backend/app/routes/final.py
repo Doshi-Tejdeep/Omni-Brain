@@ -30,7 +30,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 )
 async def final_api(
     question: str = Form(...),
-    document_id: str = Form(...),
+    document_id: str = Form(None),
     image: UploadFile = File(...),
 ):
     try:
@@ -71,11 +71,11 @@ async def final_api(
         # 3. VALIDATE DOCUMENT ID
         # =========================================================
 
-        if not document_id.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Document ID cannot be empty.",
-            )
+        if document_id is not None:
+            document_id = document_id.strip()
+
+            if not document_id:
+                document_id = None
 
         # =========================================================
         # 4. READ IMAGE
@@ -142,23 +142,28 @@ async def final_api(
 
         rag_result = None
 
-        try:
+        if document_id:
+            try:
+                logger.info(
+                    f"Starting document RAG for document: {document_id}"
+                )
+
+                rag_result = await generate_answer(
+                    question,
+                    document_id,
+                )
+
+                logger.info(
+                    "Document RAG completed."
+                )
+
+            except Exception as rag_error:
+                logger.warning(
+                    f"Document RAG skipped: {rag_error}"
+                )
+        else:
             logger.info(
-                f"Starting document RAG for document: {document_id}"
-            )
-
-            rag_result = await generate_answer(
-                question,
-                document_id,
-            )
-
-            logger.info(
-                "Document RAG completed."
-            )
-
-        except Exception as rag_error:
-            logger.warning(
-                f"Document RAG skipped: {rag_error}"
+                "No document_id provided. Running image-only Vision analysis."
             )
 
         # =========================================================
