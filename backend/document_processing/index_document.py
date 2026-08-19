@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from backend.document_processing.pdf_parser import extract_text_from_pdf
+from backend.document_processing.ocr_extractor import extract_text_with_ocr
 from backend.document_processing.chunker import chunk_pages
 from backend.vector_db.embeddings import get_embeddings
 from backend.vector_db.vector_store import VectorStore
@@ -26,6 +27,9 @@ def index_document(pdf_path, document_id):
 
     pages = extract_text_from_pdf(pdf_path)
 
+    if not pages or not any(page["text"].strip() for page in pages):
+        pages = extract_text_with_ocr(pdf_path)
+   
     if not pages:
         return None
 
