@@ -16,6 +16,9 @@ chromadb
 # Embeddings / LLM
 ollama
 
+# Vision / Google GenAI
+google-genai
+
 # PDF Processing
 PyMuPDF
 
